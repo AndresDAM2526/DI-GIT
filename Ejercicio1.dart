@@ -17,6 +17,7 @@ void main(){
   }
   if(contador==2|| contador==1){
     primos.add(aux);
+    
   }
   aux++;
  }
