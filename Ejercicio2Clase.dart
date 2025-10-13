@@ -28,25 +28,30 @@ class Calculadora{
 }
 
 void main(){
-  print("Introduzca el primer número:");
-  String? strNum1=stdin.readLineSync();
-  int num1=int.parse(strNum1!);
-  print("Introduzca el segundo número:");
-  String? strNum2=stdin.readLineSync();
-  int num2=int.parse(strNum2!);
-  Calculadora cal=Calculadora(num1, num2); 
+  try{
+    print("Introduzca el primer número:");
+    String? strNum1=stdin.readLineSync();
+    int num1=int.parse(strNum1!);
+    print("Introduzca el segundo número:");
+    String? strNum2=stdin.readLineSync();
+    int num2=int.parse(strNum2!);
+    Calculadora cal=Calculadora(num1, num2); 
 
-  int suma=cal.suma(num1, num2);
-  print("La suma es $suma");
-    
-  int resta=cal.resta(num1, num2);
-  print("La resta es $resta");
+    int suma=cal.suma(num1, num2);
+    print("La suma es $suma");
+      
+    int resta=cal.resta(num1, num2);
+    print("La resta es $resta");
 
-  int mul=cal.resta(num1, num2);
-  print("La multiplicación es $mul");
+    int mul=cal.resta(num1, num2);
+    print("La multiplicación es $mul");
 
-  int division=cal.resta(num1, num2);
-  print("La división es $division");
+    int division=cal.resta(num1, num2);
+    print("La división es $division");
+  }catch(e){
+    print("Error $e");
+  }
+  
 
 }
 
