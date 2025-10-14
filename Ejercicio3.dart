@@ -7,6 +7,8 @@
 void main(){
     Map<String,int> usuarios={"Sara":24,"Luis":18,"Pedro":35,"Marta":28};
     totalEdades(usuarios);
+    print("La edad máxima es ${edadMaxima(usuarios)}");
+    print("La edad mínima es ${edadMinima(usuarios)}");
 
 
 }
@@ -18,12 +20,11 @@ void totalEdades(Map<String,int> mapa){
     }
 
     print("La suma de todas las edades es: $suma");
-    edadMaxima(mapa);
-    edadMinima(mapa);
+
 }
 
-void edadMaxima(Map<String,int> mapa){
-  int max=0;
+int edadMaxima(Map<String,int> mapa){
+  int max=mapa.values.first;
 
   for(int clave in mapa.values){
     if(clave>=max){
@@ -31,15 +32,15 @@ void edadMaxima(Map<String,int> mapa){
     }
   }
 
-  print("La edad máxima es $max");
+  return max;
 }
 
-void edadMinima(Map<String,int> mapa){
-  int min=10000;
+int edadMinima(Map<String,int> mapa){
+  int min=mapa.values.first;
   for(int clave in mapa.values){
     if(clave<min){
       min=clave;
     }
   }
-  print("La edad mínima es $min");
+  return min;
 }
