@@ -2,8 +2,15 @@ import 'package:logger/logger.dart';
 
 
 void main() {
-  var logger=Logger();
-  logger.d("Prueba");
-  logger.f("Prueba");
+  List<String> tareas=[];
+ 
 }
+
+void anadirTarea(String tarea,List<String> tareas){
+  tareas.add(tarea);
+  Logger log=Logger();
+  log.d("Se ha añadido la tarea");
+
+}
+
 
