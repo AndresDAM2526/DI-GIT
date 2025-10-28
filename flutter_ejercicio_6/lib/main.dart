@@ -12,11 +12,12 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         body: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text("Texto1"),
+            Text("Texto1"),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(onPressed: () {}, child: Text("Boton1")),
                 ElevatedButton(onPressed: () {}, child: Text("Boton2")),
