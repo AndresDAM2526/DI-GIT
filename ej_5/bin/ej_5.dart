@@ -7,20 +7,19 @@ import 'dart:convert' as convert;
 
 import 'package:http/http.dart' as http;
 
-void main(List<String> arguments) async {
-  // This example uses the Google Books API to search for books about http.
-  // https://developers.google.com/books/docs/overview
+void main() async {
   var url =
-      Uri.http('jsonplaceholder.typicode.com', '/todos/1');
-
-  // Await the http get response, then decode the json-formatted response.
+      Uri.http('jsonplaceholder.typicode.com', '/posts',{'id':'1'});
   var response = await http.get(url);
   if (response.statusCode == 200) {
     print("Ha funcionado");
     var jsonResponse =
-        convert.jsonDecode(response.body) as Map<String, dynamic>;
+        convert.jsonDecode(response.body) ;
+    
     print(jsonResponse);
   } else {
     print('Request failed with status: ${response.statusCode}.');
   }
 }
+
+

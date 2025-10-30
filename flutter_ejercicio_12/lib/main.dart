@@ -35,7 +35,8 @@ class MainApp extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Image.network("https://placehold.co/600x400.png"),
               ),
-            ),Container(
+            ),
+            Container(
               margin: EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: Colors.amber,
@@ -45,7 +46,8 @@ class MainApp extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Image.network("https://placehold.co/600x400.png"),
               ),
-            ),Container(
+            ),
+            Container(
               margin: EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: Colors.amber,
@@ -55,7 +57,8 @@ class MainApp extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Image.network("https://placehold.co/600x400.png"),
               ),
-            ),Container(
+            ),
+            Container(
               margin: EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: Colors.amber,
@@ -65,7 +68,8 @@ class MainApp extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Image.network("https://placehold.co/600x400.png"),
               ),
-            ),Container(
+            ),
+            Container(
               margin: EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: Colors.amber,
@@ -75,7 +79,8 @@ class MainApp extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Image.network("https://placehold.co/600x400.png"),
               ),
-            ),Container(
+            ),
+            Container(
               margin: EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: Colors.amber,
