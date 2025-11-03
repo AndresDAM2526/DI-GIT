@@ -1,33 +1,81 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(MainApp());
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-  
+  final _formKey = GlobalKey<FormState>();
+  MainApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return  MaterialApp(
+    return MaterialApp(
       home: Scaffold(
-        body: Form(child: Column(children: [
-          TextFormField(
-            decoration: InputDecoration(labelText: "Nombre"),validator: (value) {
-              
-            },
+        body: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              Container(
+                margin: EdgeInsets.all(10),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    labelText: "Nombre",
+                    errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.amber),
+                    ),
+                  ),
+                  validator: (value) {
+                    return "Ingrese su nombre";
+                  },
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.all(10),
+                child: TextFormField(
+                  validator: (correo) {
+                    if (correo!.isEmpty) {
+                      return "Ingrese su correo";
+                    }
+                  },
+                  decoration: InputDecoration(
+                    labelText: "Correo electrónico",
+                    errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.all(10),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    labelText: "Contraseña",
+                    errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.green),
+                    ),
+                  ),
+                  validator: (pass) {
+                    if (pass!.length < 8) {
+                      return "La contraseña debe tener mínimo 8 caracteres";
+                    }
+                  },
+                  obscureText: true,
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    print("Formaulario correcto");
+                  } else {
+                    print("Error");
+                  }
+                },
+                child: Text("Enviar"),
+              ),
+            ],
           ),
-          TextFormField(
-            decoration: InputDecoration(labelText: "Correo electrónico"),
-          ),
-          TextFormField(
-            decoration: InputDecoration(labelText: "Contraseña"),onChanged: (text) {
-              
-            },
-            obscureText: true,
-          ),
-          ElevatedButton(onPressed: (){}, child:Text("Enviar"))
-        ],)),
+        ),
       ),
     );
   }

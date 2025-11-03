@@ -8,15 +8,23 @@ import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
 
 void main() async {
+  List<dynamic>? response= await peticionGet();
+  print("UserID: ${response?[0]['userId']}");
+  print("ID:${response?[0]['id']}");
+  print("Title: ${response?[0]['title']}");
+  print("Body: ${response?[0]['body']}");
+}
+
+Future<List<dynamic>?> peticionGet() async {
   var url =
-      Uri.http('jsonplaceholder.typicode.com', '/posts',{'id':'1'});
+      Uri.http('jsonplaceholder.typicode.com', '/posts');
   var response = await http.get(url);
   if (response.statusCode == 200) {
     print("Ha funcionado");
     var jsonResponse =
-        convert.jsonDecode(response.body) ;
+        convert.jsonDecode(response.body) as List<dynamic> ;
     
-    print(jsonResponse);
+    return jsonResponse;
   } else {
     print('Request failed with status: ${response.statusCode}.');
   }
