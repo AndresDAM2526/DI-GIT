@@ -17,7 +17,8 @@ class MainApp extends StatelessWidget {
       home: Scaffold(
         body: FutureBuilder(
           future: getResponse(),
-          builder: (context, snapshot) {  //snapshot controla el estado del future, con .data obtenemos los datos que devuelve el future
+          builder: (context, snapshot) {
+            //snapshot controla el estado del future, con .data obtenemos los datos que devuelve el future
             List<dynamic> posts = snapshot.data!;
             return ListView.builder(
               itemCount: posts.length,
@@ -30,7 +31,13 @@ class MainApp extends StatelessWidget {
                     border: BoxBorder.all(color: Colors.red),
                   ),
                   child: ListTile(
-                    leading: Text(post['userId'].toString(),style: TextStyle(fontWeight: FontWeight.bold,color: Colors.amber),),
+                    leading: Text(
+                      post['userId'].toString(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.amber,
+                      ),
+                    ),
                     title: Text(post['title']),
                     subtitle: Text(post['body']),
                   ),
