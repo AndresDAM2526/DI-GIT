@@ -9,41 +9,37 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: PantallaA());
+    return MaterialApp(home: PantallaPrincipal(nombre: 'Invitado'));
   }
 }
 
-class PantallaA extends StatefulWidget {
-
-  PantallaA({super.key});
+class PantallaPrincipal extends StatefulWidget {
+  String? nombre;
+  PantallaPrincipal({super.key, required this.nombre});
 
   @override
-  State<PantallaA> createState() => _PantallaAState();
+  State<PantallaPrincipal> createState() => _PantallaPrincipalState();
 }
 
-class _PantallaAState extends State<PantallaA> {
-  TextEditingController? controlador = TextEditingController();
-
-  String nombre = "";
-
+class _PantallaPrincipalState extends State<PantallaPrincipal> {
+  String nombre = "Invitado";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Pantalla A"), backgroundColor: Colors.amber),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          
+          Text("Hola $nombre"),
           ElevatedButton(
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              final resultado = await Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => PantallaB(nombre: nombre),
-                ),
+                MaterialPageRoute(builder: (context) => FormularioNombre()),
               );
+              setState(() {
+                nombre = resultado;
+              });
             },
-            child: Text("Pantalla B"),
+            child: Text("Ir al formulario"),
           ),
         ],
       ),
@@ -51,31 +47,30 @@ class _PantallaAState extends State<PantallaA> {
   }
 }
 
-class PantallaB extends StatefulWidget {
-  final String nombre;
-  PantallaB({super.key, required this.nombre});
+class FormularioNombre extends StatefulWidget {
+  FormularioNombre({super.key});
 
   @override
-  State<PantallaB> createState() => _PantallaBState();
+  State<FormularioNombre> createState() => _FormularioNombreState();
 }
 
-class _PantallaBState extends State<PantallaB> {
+class _FormularioNombreState extends State<FormularioNombre> {
+  TextEditingController? controlador = TextEditingController();
+  String nombre = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Esta es la pantalla B"),
-        backgroundColor: Colors.amberAccent,
-      ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text("Hola"),
+          TextFormField(
+            controller: controlador,
+            onChanged: (texto) => nombre = texto,
+          ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(context, nombre);
             },
-            child: Text("Pantalla A"),
+            child: Text("Volver a la página principal"),
           ),
         ],
       ),
