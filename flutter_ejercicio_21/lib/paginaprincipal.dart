@@ -8,22 +8,24 @@ class Paginaprincipal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Producto p1 = Producto("Ordenador", 1200, "Tecnología", 4);
-    return Column(
-      children: [
-        Text(p1.nombre),
-        Text("${p1.precio}"),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => DetallesProducto(producto: p1),
-              ),
-            );
-          },
-          child: Text("Detalles del producto"),
-        ),
-      ],
+    return Scaffold(
+      body: Column(
+        children: [
+          Text(p1.nombre),
+          Text("${p1.precio}"),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetallesProducto(producto: p1),
+                ),
+              );
+            },
+            child: Text("Detalles del producto"),
+          ),
+        ],
+      ),
     );
   }
 }
