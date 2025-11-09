@@ -1,67 +1,73 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MainApp());
+  runApp(const MainApp());
 }
 
 class MainApp extends StatefulWidget {
+  const MainApp({super.key});
+
   @override
   State<MainApp> createState() => _MainAppState();
 }
 
 class _MainAppState extends State<MainApp> {
-  bool estadoSwitch = false;
+  bool oscuro = false;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      themeMode: estadoSwitch ? ThemeMode.light : ThemeMode.light,
-      theme: ThemeData.light(),
-      home: Column(
-        children: [
-          Text("Pantalla Principal"),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Configuration()),
-              );
-            },
-            child: Text("Configuracion"),
+      theme: oscuro ? ThemeData.dark() : ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      themeMode: oscuro ? ThemeMode.dark : ThemeMode.light,
+      home: Builder(
+        builder: (context) => Scaffold(
+          body: Center(
+            child: ElevatedButton(
+              onPressed: () async {
+                final modoOscuro = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PaginaModoOscuro()),
+                );
+                setState(() {
+                  oscuro = modoOscuro;
+                });
+              },
+              child: Text("Página modo oscuro"),
+            ),
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
-class Configuration extends StatefulWidget {
+class PaginaModoOscuro extends StatefulWidget {
   @override
-  State<Configuration> createState() => _ConfigurationState();
+  State<PaginaModoOscuro> createState() => _PaginaModoOscuroState();
 }
 
-class _ConfigurationState extends State<Configuration> {
+class _PaginaModoOscuroState extends State<PaginaModoOscuro> {
   bool estadoSwitch = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: Text("Volver"),
-          ),
-          Switch(
-            value: estadoSwitch,
-            onChanged: (estado) {
-              setState(() {
-                estadoSwitch = estado;
-              });
-            },
-          ),
-        ],
+      body: Center(
+        child: Column(
+          children: [
+            Switch(
+              value: estadoSwitch,
+              onChanged: (value) => setState(() {
+                estadoSwitch = value;
+              }),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context, estadoSwitch);
+              },
+              child: Text("Volver"),
+            ),
+          ],
+        ),
       ),
     );
   }
