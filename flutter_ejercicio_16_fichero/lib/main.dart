@@ -8,24 +8,31 @@ void main() {
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       home: Scaffold(
         body: FutureBuilder(
-          future: obtenerPosts(),
+          future: obtenerDatosJson(),
           builder: (context, snapshot) {
-              var posts=snapshot.data as List;
-              return ListView.builder(itemCount: posts.length,itemBuilder: (context,index){
-                var post=posts[index];
-                return ListTile(
-                  leading: post['id'],
-                  title: post['title'],
-                  subtitle: post['body'],
-                )
-              });
+            List<dynamic> datos = snapshot.data!;
+            return ListView.builder(
+              itemCount: datos.length,
+              itemBuilder: (context, index) {
+                var dato=datos[index];
+                return Container(
+                  decoration: BoxDecoration(border: BoxBorder.all(color: Colors.red)),
+                  margin: EdgeInsets.all(20),
+                  child: ListTile(
+                    leading: Text(dato['userId'].toString()),
+                    title: Text(dato['title']),
+                    subtitle: Text(dato['body']),
+                  ),
+                );
+              },
+            );
           },
         ),
       ),
@@ -33,7 +40,9 @@ class MainApp extends StatelessWidget {
   }
 }
 
-Future<List> obtenerPosts() async {
-  var json = await rootBundle.loadString('assets/posts.json');
-  return jsonDecode(json) as List;
+Future<List<dynamic>> obtenerDatosJson() async {
+  final String datos = await rootBundle.loadString("assets/datos.json");
+  final List<dynamic> lista = jsonDecode(datos);
+  return lista;
 }
+
