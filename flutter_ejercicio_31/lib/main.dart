@@ -4,26 +4,34 @@ void main() {
   runApp(MainApp());
 }
 
+/// Widget principal, página de registro
 class MainApp extends StatefulWidget {
   MainApp({super.key});
 
   @override
-  State<MainApp> createState() => _MainAppState();
+  State<MainApp> createState() => MainAppState();
 }
 
-class _MainAppState extends State<MainApp> {
-  final _validarFormulario = GlobalKey<FormState>();
+class MainAppState extends State<MainApp> {
+  /// *Variable para gestionar la validación del formulario*
+  final validarFormulario = GlobalKey<FormState>();
 
-  final TextEditingController? email = TextEditingController();
+  /// Variable de tipo TexEditingController para almacenar el email
+  TextEditingController? email = TextEditingController();
 
-  final TextEditingController? login = TextEditingController();
+  /// *Variable de tipo TexEditingController para almacenar el login*
+  TextEditingController? login = TextEditingController();
 
-  final TextEditingController? contrasena = TextEditingController();
+  /// *Variable de tipo TexEditingController para almacenar la contraseña*
+  TextEditingController? contrasena = TextEditingController();
 
-  final TextEditingController? confirmarContrasena = TextEditingController();
+  /// *Variable de tipo TexEditingController para almacenar la contraseña*
+  TextEditingController? confirmarContrasena = TextEditingController();
 
-  String valorSeleccionado="";
+  ///String
+  String valorSeleccionado = "";
 
+  ///Lista que almacena los elementos que se muestran en el DropDown
   List<String> elementosDropDown = [
     "Términos",
     "Aceptar términos",
@@ -37,7 +45,7 @@ class _MainAppState extends State<MainApp> {
       home: Builder(
         builder: (context) => Scaffold(
           body: Form(
-            key: _validarFormulario,
+            key: validarFormulario,
             child: Column(
               children: [
                 Container(
@@ -45,7 +53,7 @@ class _MainAppState extends State<MainApp> {
                   child: TextFormField(
                     controller: email,
                     validator: (value) {
-                      if (value!.isEmpty) {
+                      if (campoVacio(value)) {
                         return "Debe introducir el email";
                       }
                     },
@@ -59,9 +67,12 @@ class _MainAppState extends State<MainApp> {
                   child: TextFormField(
                     controller: login,
                     validator: (value) {
-                      if (value!.isEmpty) {
+                      ///Se valida que el campo del Login no esté vacio
+                      if (campoVacio(value)) {
                         return "Debe introducir el login";
                       }
+
+                      ///Se valida que el usuario no utilice el usuario admin
                       if (value == "admin") {
                         return "No se puede usar ese usuario";
                       }
@@ -74,9 +85,10 @@ class _MainAppState extends State<MainApp> {
                   child: TextFormField(
                     controller: contrasena,
                     validator: (value) {
-                      if (value == "" || value!.isEmpty) {
+                      ///Se valida que el campo de la contraseña no esté vacio y que su longitud no sea inferior a 8 caracteres
+                      if (campoVacio(value)) {
                         return "Debe introducir la contraseña";
-                      } else if (value.length < 8) {
+                      } else if (value!.length < 8) {
                         return "La contraseña debe contener al menos 8 caracteres";
                       }
                     },
@@ -89,9 +101,10 @@ class _MainAppState extends State<MainApp> {
                   child: TextFormField(
                     controller: confirmarContrasena,
                     validator: (value) {
+                      ///Se valida que el campo de confirmar contraseña no esté vacio y que coincida con el campo Contraseña
                       if (value != contrasena!.text) {
                         return "Las contraseñas no coinciden";
-                      }else if(value!.isEmpty){
+                      } else if (value!.isEmpty) {
                         return "Contraseña vacia";
                       }
                     },
@@ -105,12 +118,15 @@ class _MainAppState extends State<MainApp> {
                   margin: EdgeInsets.all(20),
                   child: DropdownButtonFormField<String>(
                     validator: (value) {
-                      if(value==null||value.isEmpty){
+                      ///Se valida que el usuario haya seleccionado un elemento del DropDown
+                      if (value == null || value.isEmpty) {
                         return "Debe seleccionar una opcion";
                       }
                     },
                     hint: Text("Seleccione una opción"),
-                    initialValue: valorSeleccionado.isEmpty?null:valorSeleccionado,
+                    initialValue: valorSeleccionado.isEmpty
+                        ? null
+                        : valorSeleccionado,
                     items: elementosDropDown.map((String valor) {
                       return DropdownMenuItem<String>(
                         value: valor,
@@ -129,7 +145,7 @@ class _MainAppState extends State<MainApp> {
                     children: [
                       ElevatedButton(
                         onPressed: () {
-                          if (_validarFormulario.currentState!.validate()) {
+                          if (validarFormulario.currentState!.validate()) {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -152,7 +168,7 @@ class _MainAppState extends State<MainApp> {
                           contrasena!.clear();
                           confirmarContrasena!.clear();
                           setState(() {
-                            valorSeleccionado="";
+                            valorSeleccionado = "";
                           });
                         },
                         child: Text("Borrar datos"),
@@ -167,12 +183,29 @@ class _MainAppState extends State<MainApp> {
       ),
     );
   }
+
+  ///Funcion para comprobar que un dato no esté vacio
+  bool campoVacio(String? datos) {
+    if (datos!.isEmpty) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
 
+///Widget donde se muestran los datos introducidos por el usuario
 class DatosUsuario extends StatelessWidget {
+  ///Email del usuario
   String email;
+
+  ///Login del usuario
   String login;
+
+  ///Contraseña del usuario
   String contrasena;
+
+  ///Terminos elegidos por el usuario
   String terminos;
   DatosUsuario({
     super.key,
