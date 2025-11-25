@@ -41,18 +41,14 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Center(child: Text("Notes")),
-        leading: Builder(
-          builder: (context) {
-            return FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SettingsScreen()),
-                );
-              },
-              child: Icon(Icons.settings),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SettingsScreen()),
             );
           },
+          icon: Icon(Icons.settings),
         ),
       ),
       body: notes.isEmpty
@@ -152,11 +148,9 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool modoOscuro = false;
-
   @override
   Widget build(BuildContext context) {
-    final isDark = context.watch<ThemeProvider>().isDark;
+    bool isDark = context.watch<ThemeProvider>().isDark;
     return Scaffold(
       appBar: AppBar(title: Text("Setting screen")),
       body: Center(
@@ -166,9 +160,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               Text("Modo oscuro"),
               Switch(
-                value: modoOscuro,
+                value: isDark,
                 onChanged: (value) {
-                  modoOscuro = value;
+                  isDark = value;
                   context.read<ThemeProvider>().toggleTheme();
                 },
               ),
