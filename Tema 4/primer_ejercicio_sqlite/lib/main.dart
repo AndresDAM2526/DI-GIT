@@ -53,33 +53,36 @@ class _MainAppState extends State<MainApp> {
         appBar: AppBar(title: Center(child: Text("Formulario"))),
         body: Column(
           children: [
-            Form(
-              key: validarFormulario,
-              child: Column(
-                children: [
-                  Card(
-                    child: TextFormField(
-                      controller: nombre,
-                      decoration: InputDecoration(label: Text("Nombre")),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Introduzca su nombre";
-                        }
-                      },
+            Container(
+              margin: EdgeInsets.all(12),
+              child: Form(
+                key: validarFormulario,
+                child: Column(
+                  children: [
+                    Card(
+                      child: TextFormField(
+                        controller: nombre,
+                        decoration: InputDecoration(label: Text("Nombre")),
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Introduzca su nombre";
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                  Card(
-                    child: TextFormField(
-                      controller: edad,
-                      decoration: InputDecoration(label: Text("Edad")),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Introduzca su edad";
-                        }
-                      },
+                    Card(
+                      child: TextFormField(
+                        controller: edad,
+                        decoration: InputDecoration(label: Text("Edad")),
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Introduzca su edad";
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             ElevatedButton(
@@ -96,10 +99,21 @@ class _MainAppState extends State<MainApp> {
               },
               child: Text("Enviar"),
             ),
-            Center(
-              child: ListView.builder(
-                itemCount: _usuarios.length,
-                itemBuilder: (context, index) {},
+            Expanded(
+              child: Container(
+                margin: EdgeInsets.all(12),
+                child: ListView.builder(
+                  itemCount: _usuarios.length,
+                  itemBuilder: (context, index) {
+                    final usuario = _usuarios[index];
+                    return Card(
+                      child: ListTile(
+                        title: Text(usuario['nombre']),
+                        subtitle: Text(usuario['edad'].toString()),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ],
