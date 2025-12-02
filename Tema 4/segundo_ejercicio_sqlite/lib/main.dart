@@ -5,7 +5,12 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart';
 
 void main() {
-  runApp(MainApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => DatabaseProvider(),
+      child: MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatefulWidget {
@@ -22,28 +27,33 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        bottomNavigationBar: BottomNavigationBar(
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.format_align_center),
-              label: "Formulario",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.remove_red_eye),
-              label: "Visor",
-            ),
-            BottomNavigationBarItem(icon: Icon(Icons.help), label: "Opciones"),
-          ],
-          currentIndex: indicePagina,
-          onTap: (value) {
-            setState(() {
-              indicePagina = value;
-            });
-          },
+    return Consumer<DatabaseProvider>(
+      builder: (_, value, __) => MaterialApp(
+        home: Scaffold(
+          bottomNavigationBar: BottomNavigationBar(
+            items: [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.format_align_center),
+                label: "Formulario",
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.remove_red_eye),
+                label: "Visor",
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.help),
+                label: "Opciones",
+              ),
+            ],
+            currentIndex: indicePagina,
+            onTap: (value) {
+              setState(() {
+                indicePagina = value;
+              });
+            },
+          ),
+          body: paginas[indicePagina],
         ),
-        body: paginas[indicePagina],
       ),
     );
   }
@@ -212,20 +222,38 @@ class DatabaseProvider extends ChangeNotifier {
   List<Map<String, dynamic>> _usuarios = [];
 
   List<Map<String, dynamic>> get usuarios => _usuarios;
+  late final Future<Database> database;
+  DatabaseProvider() {
+    database = _loadDatabase();
+  }
 
-  void _crearDatabase() async {
+  Future<Database> _loadDatabase() async {
     sqfliteFfiInit();
     final databaseFactory = databaseFactoryFfi;
     final dbPath = join(
       await databaseFactory.getDatabasesPath(),
       'usuarios.db',
     );
-    final db = await databaseFactory.openDatabase(dbPath);
-    await db.execute('''CREATE TABLE IF NOT EXISTS usuarios(
+    final database = await databaseFactory.openDatabase(dbPath);
+    await database.execute('''
+      CREATE TABLE IF NOT EXISTS usuarios(
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           nombre TEXT NOT NULL,
           edad INTEGER NOT NULL
-        )''');
+        )
+    ''');
+    return database;
   }
-  
+
+  Future<void> cargarUsuarios() async {
+    final db = await database;
+    _usuarios = await db.query('usuarios');
+    notifyListeners();
+  }
+
+  Future<void> anadirUsuario(String nombre, int edad) async {
+    final db = await database;
+    await db.insert('usaurios', {'nombre': nombre, 'edad': edad});
+    notifyListeners();
+  }
 }
