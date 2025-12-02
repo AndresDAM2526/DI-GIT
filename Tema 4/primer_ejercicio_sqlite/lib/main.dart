@@ -19,7 +19,7 @@ void main() async {
 
 class MainApp extends StatefulWidget {
   Database databaseFactory;
-  MainApp({super.key, required this.databaseFactory});
+  MainApp({required this.databaseFactory});
 
   @override
   State<MainApp> createState() => _MainAppState();
@@ -33,6 +33,18 @@ class _MainAppState extends State<MainApp> {
     setState(() {
       _usuarios = usuarios;
     });
+  }
+
+  Future<void> modificarUsuarios(String nombre, int edad) async {
+    await widget.databaseFactory.update('usuarios', {'edad': edad});
+  }
+
+  Future<void> borrarUsuarios(String nombre, int edad) async {
+    await widget.databaseFactory.delete(
+      'usuarios',
+      where: 'nombre=? AND edad=?',
+      whereArgs: [nombre, edad],
+    );
   }
 
   @override
@@ -59,45 +71,94 @@ class _MainAppState extends State<MainApp> {
                 key: validarFormulario,
                 child: Column(
                   children: [
-                    Card(
-                      child: TextFormField(
-                        controller: nombre,
-                        decoration: InputDecoration(label: Text("Nombre")),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return "Introduzca su nombre";
-                          }
-                        },
+                    Container(
+                      margin: EdgeInsets.only(
+                        top: 50,
+                        left: 50,
+                        right: 50,
+                        bottom: 20,
+                      ),
+                      child: Card(
+                        child: Container(
+                          margin: EdgeInsets.all(20),
+                          child: TextFormField(
+                            controller: nombre,
+                            decoration: InputDecoration(label: Text("Nombre")),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Introduzca su nombre";
+                              }
+                            },
+                          ),
+                        ),
                       ),
                     ),
-                    Card(
-                      child: TextFormField(
-                        controller: edad,
-                        decoration: InputDecoration(label: Text("Edad")),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return "Introduzca su edad";
-                          }
-                        },
+                    Container(
+                      margin: EdgeInsets.only(
+                        top: 20,
+                        left: 50,
+                        right: 50,
+                        bottom: 25,
+                      ),
+                      child: Card(
+                        child: Container(
+                          margin: EdgeInsets.all(20),
+                          child: TextFormField(
+                            controller: edad,
+                            decoration: InputDecoration(label: Text("Edad")),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Introduzca su edad";
+                              }
+                            },
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            ElevatedButton(
-              onPressed: () async {
-                if (validarFormulario.currentState!.validate()) {
-                  final usuario = await widget.databaseFactory.insert(
-                    'usuarios',
-                    {'nombre': nombre!.text, 'edad': int.parse(edad!.text)},
-                  );
-                  _cargarUsuarios();
-                  nombre!.text = "";
-                  edad!.text = "";
-                }
-              },
-              child: Text("Enviar"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    if (validarFormulario.currentState!.validate()) {
+                      final usuario = await widget.databaseFactory.insert(
+                        'usuarios',
+                        {'nombre': nombre!.text, 'edad': int.parse(edad!.text)},
+                      );
+                      _cargarUsuarios();
+                      nombre!.clear();
+                      edad!.clear();
+                    }
+                  },
+                  child: Text("Enviar"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (validarFormulario.currentState!.validate()) {
+                      modificarUsuarios(nombre!.text, int.parse(edad!.text));
+                      _cargarUsuarios();
+                      nombre!.clear();
+                      edad!.clear();
+                    }
+                  },
+                  child: Text("Modificar Edad"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (validarFormulario.currentState!.validate()) {
+                      borrarUsuarios(nombre!.text, int.parse(edad!.text));
+                      _cargarUsuarios();
+                      nombre!.clear();
+                      edad!.clear();
+                    }
+                  },
+                  child: Text("Borrar"),
+                ),
+              ],
             ),
             Expanded(
               child: Container(
@@ -105,11 +166,10 @@ class _MainAppState extends State<MainApp> {
                 child: ListView.builder(
                   itemCount: _usuarios.length,
                   itemBuilder: (context, index) {
-                    final usuario = _usuarios[index];
                     return Card(
                       child: ListTile(
-                        title: Text(usuario['nombre']),
-                        subtitle: Text(usuario['edad'].toString()),
+                        title: Text(_usuarios[index]['nombre']),
+                        subtitle: Text(_usuarios[index]['edad'].toString()),
                       ),
                     );
                   },

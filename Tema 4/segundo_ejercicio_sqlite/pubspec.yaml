@@ -1,4 +1,4 @@
-name: primer_ejercicio_sqlite
+name: segundo_ejercicio_sqlite
 description: "A new Flutter project."
 publish_to: 'none'
 version: 0.1.0
@@ -10,6 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   path: ^1.9.1
+  provider: ^6.1.5+1
+  shared_preferences: ^2.5.3
   sqflite_common_ffi: ^2.3.6
 
 dev_dependencies:
