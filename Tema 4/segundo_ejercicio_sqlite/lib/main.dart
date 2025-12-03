@@ -6,8 +6,11 @@ import 'package:path/path.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => DatabaseProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => DatabaseProvider()),
+        ChangeNotifierProvider(create: (context) => TemaProvider()),
+      ],
       child: MainApp(),
     ),
   );
@@ -22,13 +25,28 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> {
   int indicePagina = 0;
+  bool modoClaro = false;
 
   List<Widget> paginas = [Formulario(), Visor(), Opciones()];
+  Future<void> _cargarDatos() async {
+    final prefs = await SharedPreferences.getInstance();
+    modoClaro = prefs.getBool('modoClaro') ?? false;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarDatos();
+    print(modoClaro);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<DatabaseProvider>(
       builder: (_, value, __) => MaterialApp(
+        theme: ThemeData.dark(),
+        darkTheme: ThemeData.dark(),
+        themeMode: modoClaro ? ThemeMode.light : ThemeMode.dark,
         home: Scaffold(
           bottomNavigationBar: BottomNavigationBar(
             items: [
@@ -131,6 +149,10 @@ class Formulario extends StatelessWidget {
               ElevatedButton(
                 onPressed: () async {
                   if (validarFormulario.currentState!.validate()) {
+                    context.read<DatabaseProvider>().anadirUsuario(
+                      nombre!.text,
+                      int.parse(edad!.text),
+                    );
                     nombre!.clear();
                     edad!.clear();
                   }
@@ -138,10 +160,27 @@ class Formulario extends StatelessWidget {
                 child: Text("Enviar"),
               ),
               ElevatedButton(
-                onPressed: () async {},
+                onPressed: () {
+                  context.read<DatabaseProvider>().modificarEdad(
+                    nombre!.text,
+                    int.parse(edad!.text),
+                  );
+                  nombre!.clear();
+                  edad!.clear();
+                },
                 child: Text("Modificar Edad"),
               ),
-              ElevatedButton(onPressed: () async {}, child: Text("Borrar")),
+              ElevatedButton(
+                onPressed: () {
+                  context.read<DatabaseProvider>().borrarUsuario(
+                    nombre!.text,
+                    int.parse(edad!.text),
+                  );
+                  nombre!.clear();
+                  edad!.clear();
+                },
+                child: Text("Borrar"),
+              ),
             ],
           ),
         ],
@@ -150,10 +189,37 @@ class Formulario extends StatelessWidget {
   }
 }
 
-class Visor extends StatelessWidget {
+class Visor extends StatefulWidget {
+  @override
+  State<Visor> createState() => _VisorState();
+}
+
+class _VisorState extends State<Visor> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Center(child: Text("Visor")));
+    List<Map<String, dynamic>> usuarios = context
+        .watch<DatabaseProvider>()
+        .usuarios;
+    return Scaffold(
+      appBar: AppBar(title: Center(child: Text("Visor"))),
+      body: usuarios.isEmpty
+          ? Center(child: Text("No hay datos"))
+          : ListView.builder(
+              itemCount: usuarios.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  margin: EdgeInsets.all(12),
+                  child: Card(
+                    child: ListTile(
+                      leading: Icon(Icons.person),
+                      title: Text(usuarios[index]['nombre']),
+                      subtitle: Text(usuarios[index]['edad'].toString()),
+                    ),
+                  ),
+                );
+              },
+            ),
+    );
   }
 }
 
@@ -186,6 +252,7 @@ class _OpcionesState extends State<Opciones> {
                       onChanged: (value) {
                         setState(() {
                           modoClaro = value;
+                          context.watch<TemaProvider>().cambiarTema();
                         });
                       },
                     ),
@@ -216,6 +283,11 @@ class _OpcionesState extends State<Opciones> {
       ),
     );
   }
+
+  void guardarDatos() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('modoClaro', modoClaro);
+  }
 }
 
 class DatabaseProvider extends ChangeNotifier {
@@ -225,6 +297,7 @@ class DatabaseProvider extends ChangeNotifier {
   late final Future<Database> database;
   DatabaseProvider() {
     database = _loadDatabase();
+    cargarUsuarios();
   }
 
   Future<Database> _loadDatabase() async {
@@ -253,7 +326,50 @@ class DatabaseProvider extends ChangeNotifier {
 
   Future<void> anadirUsuario(String nombre, int edad) async {
     final db = await database;
-    await db.insert('usaurios', {'nombre': nombre, 'edad': edad});
+    await db.insert('usuarios', {'nombre': nombre, 'edad': edad});
+    cargarUsuarios();
+    notifyListeners();
+  }
+
+  Future<void> modificarEdad(String nombre, int edad) async {
+    final db = await database;
+    await db.update(
+      'usuarios',
+      {'edad': edad},
+      where: 'nombre=?',
+      whereArgs: [nombre],
+    );
+    cargarUsuarios();
+    notifyListeners();
+  }
+
+  Future<void> borrarUsuario(String nombre, int edad) async {
+    final db = await database;
+    await db.delete(
+      'usuarios',
+      where: 'nombre=? AND edad=?',
+      whereArgs: [nombre, edad],
+    );
+    cargarUsuarios();
+    notifyListeners();
+  }
+}
+
+class TemaProvider extends ChangeNotifier {
+  bool _modoClaro = false;
+
+  bool get modoClaro => _modoClaro;
+
+  Future<void> cargarDatos() async {
+    final prefs = await SharedPreferences.getInstance();
+    _modoClaro = prefs.getBool('modoClaro') ?? false;
+    notifyListeners();
+  }
+
+  Future<void> cambiarTema() async {
+    _modoClaro = !_modoClaro;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('modoClaro', _modoClaro);
     notifyListeners();
   }
 }
