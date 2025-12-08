@@ -6,11 +6,8 @@ import 'package:path/path.dart';
 
 void main() {
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => DatabaseProvider()),
-        ChangeNotifierProvider(create: (context) => TemaProvider()),
-      ],
+    ChangeNotifierProvider(
+      create: (context) => DatabaseProvider(),
       child: MainApp(),
     ),
   );
@@ -25,28 +22,16 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> {
   int indicePagina = 0;
-  bool modoClaro = false;
-
+  bool modoClaro = true;
   List<Widget> paginas = [Formulario(), Visor(), Opciones()];
-  Future<void> _cargarDatos() async {
-    final prefs = await SharedPreferences.getInstance();
-    modoClaro = prefs.getBool('modoClaro') ?? false;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _cargarDatos();
-    print(modoClaro);
-  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<DatabaseProvider>(
       builder: (_, value, __) => MaterialApp(
-        theme: ThemeData.dark(),
+        theme: ThemeData.light(),
         darkTheme: ThemeData.dark(),
-        themeMode: modoClaro ? ThemeMode.light : ThemeMode.dark,
+        themeMode: value.modoClaro ? ThemeMode.light : ThemeMode.dark,
         home: Scaffold(
           bottomNavigationBar: BottomNavigationBar(
             items: [
@@ -86,7 +71,11 @@ class Formulario extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Center(child: Text("Formulario"))),
+      appBar: AppBar(
+        title: Center(
+          child: Text("Formulario", style: TextStyle(fontSize: 10)),
+        ),
+      ),
       body: Column(
         children: [
           Container(
@@ -229,13 +218,20 @@ class Opciones extends StatefulWidget {
 }
 
 class _OpcionesState extends State<Opciones> {
-  bool modoClaro = false;
-  double valorSlider = 0.0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Center(child: Text("Opciones"))),
+      appBar: AppBar(
+        title: Center(
+          child: Text(
+            "Opciones",
+            style: TextStyle(
+              fontSize:
+                  3 * (context.read<DatabaseProvider>().multiplicadorFuente),
+            ),
+          ),
+        ),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -246,13 +242,21 @@ class _OpcionesState extends State<Opciones> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Modo claro"),
+                    Text(
+                      "Modo claro",
+                      style: TextStyle(
+                        fontSize:
+                            2 *
+                            (context
+                                .read<DatabaseProvider>()
+                                .multiplicadorFuente),
+                      ),
+                    ),
                     Switch(
-                      value: modoClaro,
+                      value: context.read<DatabaseProvider>().modoClaro,
                       onChanged: (value) {
                         setState(() {
-                          modoClaro = value;
-                          context.watch<TemaProvider>().cambiarTema();
+                          context.read<DatabaseProvider>().cambiarTema();
                         });
                       },
                     ),
@@ -265,12 +269,25 @@ class _OpcionesState extends State<Opciones> {
               child: Card(
                 child: Column(
                   children: [
-                    Text("Tamaño de la fuente"),
+                    Text(
+                      "Tamaño de la fuente",
+                      style: TextStyle(
+                        fontSize:
+                            2 *
+                            (context
+                                .read<DatabaseProvider>()
+                                .multiplicadorFuente),
+                      ),
+                    ),
                     Slider(
-                      value: valorSlider,
+                      min: 5.0,
+                      max: 14.0,
+                      value: context
+                          .read<DatabaseProvider>()
+                          .multiplicadorFuente,
                       onChanged: (value) {
                         setState(() {
-                          valorSlider = value;
+                          context.read<DatabaseProvider>().cambiarFuente(value);
                         });
                       },
                     ),
@@ -283,21 +300,27 @@ class _OpcionesState extends State<Opciones> {
       ),
     );
   }
-
-  void guardarDatos() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('modoClaro', modoClaro);
-  }
 }
 
 class DatabaseProvider extends ChangeNotifier {
   List<Map<String, dynamic>> _usuarios = [];
 
   List<Map<String, dynamic>> get usuarios => _usuarios;
+
+  bool _modoClaro = false;
+
+  bool get modoClaro => _modoClaro;
+
+  double _MultiplicadorFuente = 5.0;
+
+  double get multiplicadorFuente => _MultiplicadorFuente;
+
   late final Future<Database> database;
   DatabaseProvider() {
     database = _loadDatabase();
     cargarUsuarios();
+    cargarDatosFuente();
+    cargarDatosTema();
   }
 
   Future<Database> _loadDatabase() async {
@@ -353,14 +376,8 @@ class DatabaseProvider extends ChangeNotifier {
     cargarUsuarios();
     notifyListeners();
   }
-}
 
-class TemaProvider extends ChangeNotifier {
-  bool _modoClaro = false;
-
-  bool get modoClaro => _modoClaro;
-
-  Future<void> cargarDatos() async {
+  Future<void> cargarDatosTema() async {
     final prefs = await SharedPreferences.getInstance();
     _modoClaro = prefs.getBool('modoClaro') ?? false;
     notifyListeners();
@@ -368,8 +385,21 @@ class TemaProvider extends ChangeNotifier {
 
   Future<void> cambiarTema() async {
     _modoClaro = !_modoClaro;
+    notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('modoClaro', _modoClaro);
+  }
+
+  Future<void> cargarDatosFuente() async {
+    final prefs = await SharedPreferences.getInstance();
+    _MultiplicadorFuente = prefs.getDouble('multiplicador') ?? 10.0;
+    notifyListeners();
+  }
+
+  Future<void> cambiarFuente(double multiplicador) async {
+    _MultiplicadorFuente = multiplicador;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('multiplicador', multiplicador);
     notifyListeners();
   }
 }
