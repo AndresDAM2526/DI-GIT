@@ -1,0 +1,22 @@
+[
+  {
+    "nombre": "Laptop Ultrabook",
+    "precio": 1250.99
+  },
+  {
+    "nombre": "Smartphone X10",
+    "precio": 699.50
+  },
+  {
+    "nombre": "Auriculares Inalámbricos Pro",
+    "precio": 89.90
+  },
+  {
+    "nombre": "Monitor Curvo 27 pulgadas",
+    "precio": 350.00
+  },
+  {
+    "nombre": "Teclado Mecánico RGB",
+    "precio": 55.75
+  }
+]
