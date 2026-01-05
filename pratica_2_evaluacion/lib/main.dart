@@ -60,31 +60,41 @@ class _MainAppState extends State<MainApp> {
 class Productos extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final productos = context.watch<DatabaseProvider>().productos;
     return Scaffold(
       appBar: AppBar(title: Center(child: Text("Inventario"))),
-      body: Container(
-        
-        child: FutureBuilder(
-          future: context.read<DatabaseProvider>().cargarProductos(),
-          builder: (context, snapshot) {
-            final productos = snapshot.data;
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                return Container(
-                  margin: EdgeInsets.all(5),
-                  child: ListTile(
-                    title: Text(productos![index]['nombre']),
-                    subtitle: Text("${productos[index]['precio']}"),
-                    
-                  ),
-                );
-              },
-            );
-          },
+      body: Center(
+        child: DataTable(
+          columns: [
+            DataColumn(label: Text("Nombre")),
+            DataColumn(label: Text("Categoria")),
+            DataColumn(label: Text("Cantidad")),
+            DataColumn(label: Text("Precio")),
+          ],
+          rows: productos
+              .map(
+                (producto) => DataRow(
+                  cells: [
+                    DataCell(Text(producto['nombre'])),
+                    DataCell(Text(producto['categoria'])),
+                    DataCell(Text(producto['cantidad'].toString())),
+                    DataCell(Text(producto['precio'].toString())),
+                  ],
+                ),
+              )
+              .toList(),
         ),
       ),
-      floatingActionButton: FloatingActionButton(onPressed: () {}),
+      floatingActionButton: FloatingActionButton(
+        tooltip: "Añadir producto",
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => anadirProductos()),
+          );
+        },
+        child: Icon(Icons.add_circle_sharp),
+      ),
     );
   }
 }
@@ -312,12 +322,15 @@ class _anadirProductosState extends State<anadirProductos> {
 }
 
 class DatabaseProvider extends ChangeNotifier {
+  List<Map<String, dynamic>> _productos = [];
+  List<Map<String, dynamic>> get productos => _productos;
   List<Map<String, dynamic>> _categorias = [];
   List<Map<String, dynamic>> get categorias => _categorias;
   late final Future<Database> database;
 
   DatabaseProvider() {
     database = _loadDatabase();
+    cargarProductos();
   }
 
   Future<Database> _loadDatabase() async {
@@ -366,6 +379,7 @@ class DatabaseProvider extends ChangeNotifier {
       'cantidad': producto.cantidad,
       'precio': producto.precio,
     });
+    cargarProductos();
     notifyListeners();
   }
 
@@ -377,9 +391,12 @@ class DatabaseProvider extends ChangeNotifier {
         .toList();
   }
 
-  Future<List<Map<String, dynamic>>> cargarProductos() async {
+  Future<void> cargarProductos() async {
     final db = await database;
-    return db.query('producto');
+    _productos = await db.rawQuery(
+      'SELECT p.nombre,c.categoria as categoria,p.cantidad,p.precio FROM producto p INNER JOIN categoria c ON c.idCategoria=p.idCategoria',
+    );
+    notifyListeners();
   }
 
   Future<int> obtenerIdCategoria(String categoria) async {
@@ -391,5 +408,16 @@ class DatabaseProvider extends ChangeNotifier {
       whereArgs: [categoria],
     );
     return resultado.first['idCategoria'];
+  }
+
+  Future<String> obtenerCategoria(int idCategoria) async {
+    final db = await database;
+    final List<Map<String, dynamic>> resultado = await db.query(
+      'categoria',
+      columns: ['categoria'],
+      where: 'idCategoria=?',
+      whereArgs: [idCategoria],
+    );
+    return resultado.first['categoria'];
   }
 }
