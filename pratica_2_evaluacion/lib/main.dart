@@ -70,6 +70,7 @@ class Productos extends StatelessWidget {
             DataColumn(label: Text("Categoria")),
             DataColumn(label: Text("Cantidad")),
             DataColumn(label: Text("Precio")),
+            DataColumn(label: Text("")),
           ],
           rows: productos
               .map(
@@ -79,6 +80,42 @@ class Productos extends StatelessWidget {
                     DataCell(Text(producto['categoria'])),
                     DataCell(Text(producto['cantidad'].toString())),
                     DataCell(Text(producto['precio'].toString())),
+                    DataCell(
+                      Row(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.all(10),
+                            child: FloatingActionButton(
+                              heroTag:
+                                  "modificar-${producto['nombre']}", //Identificador único para la animación hero, que es la que realiza cuando se cambia de pantalla
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => modificarProducto(
+                                      idProducto: producto['idProducto'],
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Icon(Icons.mode),
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.all(10),
+                            child: FloatingActionButton(
+                              heroTag: "eliminar-${producto['nombre']}",
+                              onPressed: () {
+                                context.read<DatabaseProvider>().borrarProducto(
+                                  producto['idProducto'],
+                                );
+                              },
+                              child: Icon(Icons.delete),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               )
@@ -181,7 +218,6 @@ class anadirProductos extends StatefulWidget {
 class _anadirProductosState extends State<anadirProductos> {
   late Future<List<String>> categorias;
   TextEditingController controladorNombre = TextEditingController();
-  TextEditingController controladorCategoria = TextEditingController();
   TextEditingController controladorCantidad = TextEditingController();
   TextEditingController controladorPrecio = TextEditingController();
   final validadFormulario = GlobalKey<FormState>();
@@ -300,10 +336,6 @@ class _anadirProductosState extends State<anadirProductos> {
                         cantidad: int.parse(controladorCantidad.text),
                         precio: double.parse(controladorPrecio.text),
                       );
-                      print(controladorNombre.text);
-                      print(categoriaSeleccionada);
-                      print(controladorCantidad.text);
-                      print(controladorPrecio.text);
                       context.read<DatabaseProvider>().anadirProducto(
                         nuevoProducto,
                       );
@@ -315,6 +347,151 @@ class _anadirProductosState extends State<anadirProductos> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class modificarProducto extends StatefulWidget {
+  int idProducto;
+  modificarProducto({required this.idProducto});
+  @override
+  State<modificarProducto> createState() => _modificarProductoState();
+}
+
+class _modificarProductoState extends State<modificarProducto> {
+  final validarFormulario = GlobalKey<FormState>();
+  TextEditingController controladorNombre = TextEditingController();
+  TextEditingController controladorCantidad = TextEditingController();
+  TextEditingController controladorPrecio = TextEditingController();
+  GlobalKey<FormFieldState> keyDropDown = GlobalKey();
+  late Future<List<String>> categorias;
+  String? categoriaSeleccionada;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Center(child: Text("Modificar producto"))),
+      body: Form(
+        key: validarFormulario,
+        child: Column(
+          children: [
+            Card(
+              child: Container(
+                margin: EdgeInsets.all(10),
+                child: TextFormField(
+                  controller: controladorNombre,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Introduzca un nombre";
+                    }
+                  },
+                  decoration: InputDecoration(label: Text("Nombre")),
+                ),
+              ),
+            ),
+            Card(
+              child: Container(
+                margin: EdgeInsets.all(10),
+                child: FutureBuilder(
+                  future: context.read<DatabaseProvider>().cargarCategorias(),
+                  builder: (context, snapshot) {
+                    final categorias = snapshot.data!;
+                    return DropdownButtonFormField(
+                      key: keyDropDown,
+                      validator: (value) {
+                        if (value == null) {
+                          return "Categoria no seleccionada";
+                        }
+                      },
+                      hint: Text("Seleccione una categoria"),
+                      items: categorias
+                          .map(
+                            (categoria) => DropdownMenuItem(
+                              value: categoria,
+                              child: Text(categoria),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          categoriaSeleccionada = value;
+                        });
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+            Card(
+              child: Container(
+                margin: EdgeInsets.all(10),
+                child: TextFormField(
+                  controller: controladorCantidad,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Introduzca la cantidad";
+                    } else if (int.tryParse(value) == null) {
+                      return "El formato introducido es incorrecto";
+                    }
+                  },
+                  decoration: InputDecoration(label: Text("Cantidad")),
+                ),
+              ),
+            ),
+            Card(
+              child: Container(
+                margin: EdgeInsets.all(10),
+                child: TextFormField(
+                  controller: controladorPrecio,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Precio no introducido";
+                    } else if (double.tryParse(value) == null) {
+                      return "El formato introducido es incorrecto";
+                    }
+                  },
+                  decoration: InputDecoration(label: Text("Precio")),
+                ),
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.all(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      if (validarFormulario.currentState!.validate()) {
+                        Producto productoModificado = Producto(
+                          nombre: controladorNombre.text,
+                          categoria: categoriaSeleccionada!,
+                          cantidad: int.parse(controladorCantidad.text),
+                          precio: double.parse(controladorPrecio.text),
+                        );
+                        context.read<DatabaseProvider>().modificarProducto(
+                          widget.idProducto,
+                          productoModificado,
+                        );
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Text("Modificar"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      controladorNombre.clear();
+                      controladorCantidad.clear();
+                      controladorPrecio.clear();
+                      keyDropDown.currentState!.reset();
+                    },
+                    child: Text("Limpiar campos"),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -394,7 +571,7 @@ class DatabaseProvider extends ChangeNotifier {
   Future<void> cargarProductos() async {
     final db = await database;
     _productos = await db.rawQuery(
-      'SELECT p.nombre,c.categoria as categoria,p.cantidad,p.precio FROM producto p INNER JOIN categoria c ON c.idCategoria=p.idCategoria',
+      'SELECT p.idProducto,p.nombre,c.categoria as categoria,p.cantidad,p.precio FROM producto p INNER JOIN categoria c ON c.idCategoria=p.idCategoria',
     );
     notifyListeners();
   }
@@ -419,5 +596,30 @@ class DatabaseProvider extends ChangeNotifier {
       whereArgs: [idCategoria],
     );
     return resultado.first['categoria'];
+  }
+
+  Future<void> borrarProducto(int idProducto) async {
+    final db = await database;
+    await db.delete('producto', where: 'idProducto=?', whereArgs: [idProducto]);
+    cargarProductos();
+    notifyListeners();
+  }
+
+  Future<void> modificarProducto(int idProducto, Producto producto) async {
+    int categoria = await obtenerIdCategoria(producto.categoria);
+    final db = await database;
+    await db.update(
+      'producto',
+      {
+        'nombre': producto.nombre,
+        'idcategoria': categoria,
+        'cantidad': producto.cantidad,
+        'precio': producto.precio,
+      },
+      where: 'idProducto=?',
+      whereArgs: [idProducto],
+    );
+    cargarProductos();
+    notifyListeners();
   }
 }
