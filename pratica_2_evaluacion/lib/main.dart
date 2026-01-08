@@ -1,9 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:pratica_2_evaluacion/Factura.dart';
 import 'package:pratica_2_evaluacion/Producto.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(
@@ -111,6 +114,15 @@ class Productos extends StatelessWidget {
                                 );
                               },
                               child: Icon(Icons.delete),
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.all(10),
+                            child: FloatingActionButton(
+                              tooltip: "Añadir al carrito",
+                              onPressed: () {
+                              },
+                              child: Icon(Icons.shopping_cart),
                             ),
                           ),
                         ],
@@ -499,6 +511,8 @@ class _modificarProductoState extends State<modificarProducto> {
 }
 
 class DatabaseProvider extends ChangeNotifier {
+  List<Producto> carrito = [];
+  List<Factura> facturas = [];
   List<Map<String, dynamic>> _productos = [];
   List<Map<String, dynamic>> get productos => _productos;
   List<Map<String, dynamic>> _categorias = [];
@@ -508,6 +522,41 @@ class DatabaseProvider extends ChangeNotifier {
   DatabaseProvider() {
     database = _loadDatabase();
     cargarProductos();
+  }
+
+  //Función para poder convertir el carrito(List<Producto>) a List<String> para poder guardarlo en el SharedPreferences
+  List<String> convertirCarrito(List<Producto> productos) {
+    //jsonEncode convierte un objeto que está en formato json a un objeto en formato String, luego lo convierto a una lista
+    return productos.map((producto) => jsonEncode(producto.toJson())).toList();
+  }
+
+  //Función para poder convertir la lista de facturas a formato List<String para poder guardarlo en SharedPreferences
+  List<String> convertirFactura(List<Factura> facturas) {
+    return facturas.map((factura) => jsonEncode(factura.toJson())).toList();
+  }
+
+  void anadirProductoCarrito(Producto producto) async {
+    carrito.add(producto);
+    List<String> carritoSerializado = convertirCarrito(carrito);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('carrito', carritoSerializado);
+  }
+
+  void guardarDatosCarrito(List<String> carritoSerializado) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('carrito', carritoSerializado);
+  }
+
+  Future<List<String>?> obtenerDatosCarrito() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList('carrito');
+  }
+
+  void anadirDatosFacturas(Factura factura) async {
+    facturas.add(factura);
+    List<String> facturasSerializada = convertirFactura(facturas);
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('facturas', facturasSerializada);
   }
 
   Future<Database> _loadDatabase() async {
