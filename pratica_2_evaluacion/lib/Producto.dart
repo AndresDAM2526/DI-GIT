@@ -18,4 +18,12 @@ class Producto {
     'precio': precio,
   };
 
+  factory Producto.fromJson(Map<String, dynamic> json) {
+    return Producto(
+      nombre: json['nombre'],
+      categoria: json['categoria'],
+      cantidad: json['cantidad'],
+      precio: json['precio'],
+    );
+  }
 }

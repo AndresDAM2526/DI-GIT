@@ -64,75 +64,122 @@ class Productos extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final productos = context.watch<DatabaseProvider>().productos;
+    final productosCarrito = context.watch<DatabaseProvider>().carrito;
     return Scaffold(
       appBar: AppBar(title: Center(child: Text("Inventario"))),
-      body: Center(
-        child: DataTable(
-          columns: [
-            DataColumn(label: Text("Nombre")),
-            DataColumn(label: Text("Categoria")),
-            DataColumn(label: Text("Cantidad")),
-            DataColumn(label: Text("Precio")),
-            DataColumn(label: Text("")),
-          ],
-          rows: productos
-              .map(
-                (producto) => DataRow(
-                  cells: [
-                    DataCell(Text(producto['nombre'])),
-                    DataCell(Text(producto['categoria'])),
-                    DataCell(Text(producto['cantidad'].toString())),
-                    DataCell(Text(producto['precio'].toString())),
-                    DataCell(
-                      Row(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.all(10),
-                            child: FloatingActionButton(
-                              heroTag:
-                                  "modificar-${producto['nombre']}", //Identificador único para la animación hero, que es la que realiza cuando se cambia de pantalla
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => modificarProducto(
-                                      idProducto: producto['idProducto'],
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Icon(Icons.mode),
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.all(10),
-                            child: FloatingActionButton(
-                              heroTag: "eliminar-${producto['nombre']}",
-                              onPressed: () {
-                                context.read<DatabaseProvider>().borrarProducto(
-                                  producto['idProducto'],
-                                );
-                              },
-                              child: Icon(Icons.delete),
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.all(10),
-                            child: FloatingActionButton(
-                              tooltip: "Añadir al carrito",
-                              onPressed: () {
-                              },
-                              child: Icon(Icons.shopping_cart),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+      body: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                margin: EdgeInsets.all(4),
+                child: Text(
+                  productosCarrito.isEmpty
+                      ? "No hay productos en el carrito"
+                      : "Productos en el carrito: ${productosCarrito.length}",
                 ),
-              )
-              .toList(),
-        ),
+              ),
+              Container(
+                margin: EdgeInsets.all(2),
+                child: ElevatedButton(
+                  onPressed: () {
+                    List<Producto> productos = context
+                        .read<DatabaseProvider>()
+                        .carrito;
+                    Factura nuevaFactura = Factura(
+                      fecha: DateTime.now(),
+                      productos: List.from(productos),
+                    );
+                    context.read<DatabaseProvider>().anadirDatosFacturas(
+                      nuevaFactura,
+                    );
+                  },
+                  child: Text("Realizar compra"),
+                ),
+              ),
+            ],
+          ),
+          DataTable(
+            columns: [
+              DataColumn(label: Text("Nombre")),
+              DataColumn(label: Text("Categoria")),
+              DataColumn(label: Text("Cantidad")),
+              DataColumn(label: Text("Precio")),
+              DataColumn(label: Text("")),
+            ],
+            rows: productos
+                .map(
+                  (producto) => DataRow(
+                    cells: [
+                      DataCell(Text(producto['nombre'])),
+                      DataCell(Text(producto['categoria'])),
+                      DataCell(Text(producto['cantidad'].toString())),
+                      DataCell(Text(producto['precio'].toString())),
+                      DataCell(
+                        Row(
+                          children: [
+                            Container(
+                              margin: EdgeInsets.all(10),
+                              child: FloatingActionButton(
+                                heroTag:
+                                    "modificar-${producto['nombre']}", //Identificador único para la animación hero, que es la que realiza cuando se cambia de pantalla
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => modificarProducto(
+                                        idProducto: producto['idProducto'],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Icon(Icons.mode),
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.all(10),
+                              child: FloatingActionButton(
+                                heroTag: "eliminar-${producto['nombre']}",
+                                onPressed: () {
+                                  context
+                                      .read<DatabaseProvider>()
+                                      .borrarProducto(producto['idProducto']);
+                                },
+                                child: Icon(Icons.delete),
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.all(10),
+                              child: FloatingActionButton(
+                                tooltip: "Añadir al carrito",
+                                onPressed: () {
+                                  String nombre = producto['nombre'];
+                                  String categoria = producto['categoria'];
+                                  int cantidad = producto['cantidad'];
+                                  double precio = producto['precio'];
+                                  Producto nuevoProducto = Producto(
+                                    nombre: nombre,
+                                    categoria: categoria,
+                                    cantidad: cantidad,
+                                    precio: precio,
+                                  );
+                                  context
+                                      .read<DatabaseProvider>()
+                                      .anadirProductoCarrito(nuevoProducto);
+                                },
+                                child: Icon(Icons.shopping_cart),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+                .toList(),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         tooltip: "Añadir producto",
@@ -151,9 +198,19 @@ class Productos extends StatelessWidget {
 class Facturas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final facturas = context.watch<DatabaseProvider>().facturas;
     return Scaffold(
-      appBar: AppBar(title: Center(child: Text("Facturas"))),
-      body: Center(child: Text("Facturas")),
+      appBar: AppBar(title: Center(child: Text("Facturas,${facturas.length}"))),
+      body: ListView.builder(
+        itemCount: facturas.length,
+        itemBuilder: (context, index) {
+          final factura = facturas[index];
+          return ListTile(
+            title: Text(factura.fecha.toString()),
+            subtitle: Text("${factura.productos.map((prod) => prod.nombre)}"),
+          );
+        },
+      ),
     );
   }
 }
@@ -530,14 +587,16 @@ class DatabaseProvider extends ChangeNotifier {
     return productos.map((producto) => jsonEncode(producto.toJson())).toList();
   }
 
-  //Función para poder convertir la lista de facturas a formato List<String para poder guardarlo en SharedPreferences
+  //Función para poder convertir la lista de facturas a formato List<String> para poder guardarlo en SharedPreferences
   List<String> convertirFactura(List<Factura> facturas) {
     return facturas.map((factura) => jsonEncode(factura.toJson())).toList();
   }
 
+
   void anadirProductoCarrito(Producto producto) async {
     carrito.add(producto);
     List<String> carritoSerializado = convertirCarrito(carrito);
+    notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList('carrito', carritoSerializado);
   }
@@ -555,8 +614,18 @@ class DatabaseProvider extends ChangeNotifier {
   void anadirDatosFacturas(Factura factura) async {
     facturas.add(factura);
     List<String> facturasSerializada = convertirFactura(facturas);
+    notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList('facturas', facturasSerializada);
+    vaciarCarrito();
+  }
+
+  void vaciarCarrito() async {
+    carrito.clear();
+    List<String> carritoSerializado = convertirCarrito(carrito);
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('carrito', carritoSerializado);
   }
 
   Future<Database> _loadDatabase() async {
