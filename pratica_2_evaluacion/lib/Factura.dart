@@ -12,5 +12,10 @@ class Factura {
     'productos': productos.map((producto) => producto.toJson()).toList(),
   };
 
-
+  factory Factura.fromJson(Map<String, dynamic> json) {
+    return Factura(
+      fecha: DateTime.parse(json['fecha']),
+      productos: json['productos'],
+    );
+  }
 }

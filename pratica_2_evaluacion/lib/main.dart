@@ -579,6 +579,7 @@ class DatabaseProvider extends ChangeNotifier {
   DatabaseProvider() {
     database = _loadDatabase();
     cargarProductos();
+    obtenerDatosCarrito();
   }
 
   //Función para poder convertir el carrito(List<Producto>) a List<String> para poder guardarlo en el SharedPreferences
@@ -591,7 +592,6 @@ class DatabaseProvider extends ChangeNotifier {
   List<String> convertirFactura(List<Factura> facturas) {
     return facturas.map((factura) => jsonEncode(factura.toJson())).toList();
   }
-
 
   void anadirProductoCarrito(Producto producto) async {
     carrito.add(producto);
@@ -606,9 +606,17 @@ class DatabaseProvider extends ChangeNotifier {
     await prefs.setStringList('carrito', carritoSerializado);
   }
 
-  Future<List<String>?> obtenerDatosCarrito() async {
+  Future<void> obtenerDatosCarrito() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getStringList('carrito');
+    List<String>? carritoSerializado = prefs.getStringList('carrito');
+    carrito = carritoSerializado!
+        .map((producto) => Producto.fromJson(jsonDecode(producto)))
+        .toList();
+  }
+
+  Future<void> obtenerDatosFacturas() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String>? facturasSerializada = prefs.getStringList('facturas');
   }
 
   void anadirDatosFacturas(Factura factura) async {
@@ -652,6 +660,19 @@ class DatabaseProvider extends ChangeNotifier {
                           precio REAL NOT NULL,
 
                           FOREIGN KEY (idCategoria) references categoria(idCategoria) ON DELETE CASCADE ON UPDATE CASCADE
+                    )''');
+          await db.execute('''CREATE TABLE IF NOT EXISTS factura(
+                          idFactura INTEGER PRIMARY KEY AUTOINCREMENT,
+                          fecha TEXT NOT NULL
+                    )''');
+          await db.execute('''CREATE TABLE IF NOT EXISTS detalle_factura(
+                          idDetalle INTEGER PRIMARY KEY AUTOINCREMENT,
+                          idFactura INTEGER,
+                          idProducto INTEGER,
+                          precio REAL NOT NULL,
+
+                          FOREIGN KEY(idFactura) references factura(idFactura) ON DELETE CASCADE ON UPDATE CASCADE,
+                          FOREIGN KEY(idProducto) references producto(idProducto) ON DELETE CASCADE ON UPDATE CASCADE
                     )''');
           await db.insert('categoria', {'categoria': 'Hardware'});
           await db.insert('categoria', {'categoria': 'Perifericos'});
