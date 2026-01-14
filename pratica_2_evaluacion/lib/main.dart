@@ -87,13 +87,7 @@ class Productos extends StatelessWidget {
                     List<Producto> productos = context
                         .read<DatabaseProvider>()
                         .carrito;
-                    Factura nuevaFactura = Factura(
-                      fecha: DateTime.now(),
-                      productos: List.from(productos),
-                    );
-                    context.read<DatabaseProvider>().anadirDatosFacturas(
-                      nuevaFactura,
-                    );
+                    context.read<DatabaseProvider>().crearFactura(productos);
                   },
                   child: Text("Realizar compra"),
                 ),
@@ -154,11 +148,13 @@ class Productos extends StatelessWidget {
                               child: FloatingActionButton(
                                 tooltip: "Añadir al carrito",
                                 onPressed: () {
+                                  int idProducto = producto['idProducto'];
                                   String nombre = producto['nombre'];
                                   String categoria = producto['categoria'];
                                   int cantidad = producto['cantidad'];
                                   double precio = producto['precio'];
                                   Producto nuevoProducto = Producto(
+                                    idProducto: idProducto,
                                     nombre: nombre,
                                     categoria: categoria,
                                     cantidad: cantidad,
@@ -198,16 +194,18 @@ class Productos extends StatelessWidget {
 class Facturas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final facturas = context.watch<DatabaseProvider>().facturas;
     return Scaffold(
-      appBar: AppBar(title: Center(child: Text("Facturas,${facturas.length}"))),
-      body: ListView.builder(
-        itemCount: facturas.length,
-        itemBuilder: (context, index) {
-          final factura = facturas[index];
-          return ListTile(
-            title: Text(factura.fecha.toString()),
-            subtitle: Text("${factura.productos.map((prod) => prod.nombre)}"),
+      appBar: AppBar(title: Center(child: Text("Facturas"))),
+      body: FutureBuilder(
+        future: context.read<DatabaseProvider>().obtenerFacturas(),
+        builder: (context, snapshot) {
+          final facturas = snapshot.data!;
+          return ListView.builder(
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              final factura = facturas[index];
+              return ListTile(title: Text(factura['fecha']));
+            },
           );
         },
       ),
@@ -400,6 +398,7 @@ class _anadirProductosState extends State<anadirProductos> {
                   onPressed: () {
                     if (validadFormulario.currentState!.validate()) {
                       Producto nuevoProducto = Producto(
+                        idProducto: 0,
                         nombre: controladorNombre.text,
                         categoria: categoriaSeleccionada!,
                         cantidad: int.parse(controladorCantidad.text),
@@ -534,6 +533,7 @@ class _modificarProductoState extends State<modificarProducto> {
                     onPressed: () {
                       if (validarFormulario.currentState!.validate()) {
                         Producto productoModificado = Producto(
+                          idProducto: 0,
                           nombre: controladorNombre.text,
                           categoria: categoriaSeleccionada!,
                           cantidad: int.parse(controladorCantidad.text),
@@ -588,11 +588,6 @@ class DatabaseProvider extends ChangeNotifier {
     return productos.map((producto) => jsonEncode(producto.toJson())).toList();
   }
 
-  //Función para poder convertir la lista de facturas a formato List<String> para poder guardarlo en SharedPreferences
-  List<String> convertirFactura(List<Factura> facturas) {
-    return facturas.map((factura) => jsonEncode(factura.toJson())).toList();
-  }
-
   void anadirProductoCarrito(Producto producto) async {
     carrito.add(producto);
     List<String> carritoSerializado = convertirCarrito(carrito);
@@ -612,20 +607,6 @@ class DatabaseProvider extends ChangeNotifier {
     carrito = carritoSerializado!
         .map((producto) => Producto.fromJson(jsonDecode(producto)))
         .toList();
-  }
-
-  Future<void> obtenerDatosFacturas() async {
-    final prefs = await SharedPreferences.getInstance();
-    List<String>? facturasSerializada = prefs.getStringList('facturas');
-  }
-
-  void anadirDatosFacturas(Factura factura) async {
-    facturas.add(factura);
-    List<String> facturasSerializada = convertirFactura(facturas);
-    notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('facturas', facturasSerializada);
-    vaciarCarrito();
   }
 
   void vaciarCarrito() async {
@@ -760,5 +741,26 @@ class DatabaseProvider extends ChangeNotifier {
     );
     cargarProductos();
     notifyListeners();
+  }
+
+  Future<void> crearFactura(List<Producto> productos) async {
+    final db = await database;
+    int idFactura = await db.insert('factura', {
+      'fecha': DateTime.now().toString(),
+    });
+    for (Producto prod in productos) {
+      await db.insert('detalle_factura', {
+        'idFactura': idFactura,
+        'idProducto': prod.idProducto,
+        'precio': prod.precio,
+      });
+    }
+    notifyListeners();
+    vaciarCarrito();
+  }
+
+  Future<List<Map<String, dynamic>>> obtenerFacturas() async {
+    final db = await database;
+    return db.query('factura');
   }
 }
