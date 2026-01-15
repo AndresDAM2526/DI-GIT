@@ -1,0 +1,14 @@
+{
+    "title": "Contacto Form",
+    "name": "Name",
+    "labelName": "Name",
+    "hintName": "Write your name",
+    "email": "Email",
+    "labelEmail": "Email",
+    "hintEmail": "Write your email",
+    "tf": "Telephone",
+    "labelTf": "Telephone",
+    "hintTf": "Write your telephone",
+    "submit": "Submit",
+    "clear" : "Clear"
+}

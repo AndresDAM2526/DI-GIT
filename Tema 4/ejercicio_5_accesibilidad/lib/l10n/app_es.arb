@@ -1,0 +1,14 @@
+{
+    "title": "Formulario de contacto",
+    "name": "Nombre",
+    "labelName": "Nombre",
+    "hintName": "Introduce el nombre",
+    "email": "Correo",
+    "labelEmail": "Correo",
+    "hintEmail": "Introduce el nombre",
+    "tf": "Teléfono",
+    "labelTf": "Teléfono",
+    "hintTf": "Introduce el teléfono",
+    "submit": "Enviar",
+    "clear" : "Limpiar"
+}
