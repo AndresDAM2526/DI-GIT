@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(
@@ -204,7 +205,17 @@ class Facturas extends StatelessWidget {
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
               final factura = facturas[index];
-              return ListTile(title: Text(factura['fecha']));
+              return Container(
+                margin: EdgeInsets.all(10),
+                child: Card(
+                  child: ListTile(
+                    leading: Text(factura['idFactura'].toString()),
+                    title: Text(factura['fecha']),
+                    subtitle: Text(factura['total'].toString()),
+                    trailing: Text("Generar pdf"),
+                  ),
+                ),
+              );
             },
           );
         },
@@ -644,13 +655,13 @@ class DatabaseProvider extends ChangeNotifier {
                     )''');
           await db.execute('''CREATE TABLE IF NOT EXISTS factura(
                           idFactura INTEGER PRIMARY KEY AUTOINCREMENT,
-                          fecha TEXT NOT NULL
+                          fecha TEXT NOT NULL,
+                          total REAL NOT NULL
                     )''');
           await db.execute('''CREATE TABLE IF NOT EXISTS detalle_factura(
                           idDetalle INTEGER PRIMARY KEY AUTOINCREMENT,
                           idFactura INTEGER,
                           idProducto INTEGER,
-                          precio REAL NOT NULL,
 
                           FOREIGN KEY(idFactura) references factura(idFactura) ON DELETE CASCADE ON UPDATE CASCADE,
                           FOREIGN KEY(idProducto) references producto(idProducto) ON DELETE CASCADE ON UPDATE CASCADE
@@ -745,18 +756,28 @@ class DatabaseProvider extends ChangeNotifier {
 
   Future<void> crearFactura(List<Producto> productos) async {
     final db = await database;
+    DateTime fechaActual = DateTime.now();
+    DateFormat formatoFecha = DateFormat('dd/MM/yyyy');
+    String fechaFormateada = formatoFecha.format(fechaActual);
+    double total = calcularCosteTotalCarrito(productos);
     int idFactura = await db.insert('factura', {
-      'fecha': DateTime.now().toString(),
+      'fecha': fechaFormateada,
+      'total': total,
     });
     for (Producto prod in productos) {
       await db.insert('detalle_factura', {
         'idFactura': idFactura,
         'idProducto': prod.idProducto,
-        'precio': prod.precio,
       });
     }
     notifyListeners();
     vaciarCarrito();
+  }
+
+  double calcularCosteTotalCarrito(List<Producto> productos) {
+    double total = 0.0;
+    productos.forEach((producto) => total += producto.precio);
+    return total;
   }
 
   Future<List<Map<String, dynamic>>> obtenerFacturas() async {
