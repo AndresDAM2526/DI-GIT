@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pratica_2_evaluacion/Factura.dart';
 import 'package:pratica_2_evaluacion/Producto.dart';
+import 'package:pratica_2_evaluacion/producto_factura.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 void main() {
   runApp(
@@ -212,7 +214,19 @@ class Facturas extends StatelessWidget {
                     leading: Text(factura['idFactura'].toString()),
                     title: Text(factura['fecha']),
                     subtitle: Text(factura['total'].toString()),
-                    trailing: Text("Generar pdf"),
+                    trailing: ElevatedButton(
+                      onPressed: () async {
+                        final productos = context
+                            .read<DatabaseProvider>()
+                            .productosFactura(factura['idFactura']);
+                        context.read<DatabaseProvider>().generarPDF(
+                          productos,
+                          factura['idFactura'],
+                          factura['fecha'],
+                        );
+                      },
+                      child: Text("Generar PDF"),
+                    ),
                   ),
                 ),
               );
@@ -783,5 +797,80 @@ class DatabaseProvider extends ChangeNotifier {
   Future<List<Map<String, dynamic>>> obtenerFacturas() async {
     final db = await database;
     return db.query('factura');
+  }
+
+  Future<List<ProductoFactura>> productosFactura(int idFactura) async {
+    final db = await database;
+    final productos = await db.rawQuery(
+      'select p.nombre,p.precio FROM Producto p INNER JOIN detalle_factura df ON df.idProducto=p.idProducto INNER JOIN factura f on df.idFactura=f.idFactura WHERE f.idFactura= ? ',
+      [idFactura],
+    );
+    return productos
+        .map((producto) => ProductoFactura.fromJson(producto))
+        .toList();
+  }
+
+  Future<void> generarPDF(
+    Future<List<ProductoFactura>> productosFactura,
+    int idFactura,
+    String fecha,
+  ) async {
+    final productos = await productosFactura;
+    final pdf = pw.Document();
+    pdf.addPage(
+      pw.Page(
+        build: (context) {
+          return pw.Column(
+            children: [
+              pw.Container(child: pw.Text("Tienda de electrónica")),
+              pw.Container(
+                child: pw.Column(
+                  children: [
+                    pw.Text("Identificador de factura: $idFactura"),
+                    pw.Text("Fecha: $fecha"),
+                  ],
+                ),
+              ),
+              pw.Container(
+                margin: pw.EdgeInsets.all(20),
+                child: pw.Table(
+                  border: pw.TableBorder.all(),
+                  children: [
+                    pw.TableRow(
+                      children: [
+                        pw.Padding(
+                          padding: pw.EdgeInsets.all(5),
+                          child: pw.Text("Producto"),
+                        ),
+                        pw.Padding(
+                          padding: pw.EdgeInsets.all(5),
+                          child: pw.Text("Precio"),
+                        ),
+                      ],
+                    ),
+                    ...productos.map(
+                      (producto) => pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: pw.EdgeInsets.all(5),
+                            child: pw.Text(producto.nombre),
+                          ),
+                          pw.Padding(
+                            padding: pw.EdgeInsets.all(5),
+                            child: pw.Text("${producto.precio}"),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+    final file = File("Factura_$idFactura.pdf");
+    await file.writeAsBytes(await pdf.save());
   }
 }
