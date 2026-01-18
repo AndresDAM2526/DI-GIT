@@ -24,116 +24,148 @@ class _anadirProductosState extends State<anadirProductos> {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Center(child: Text(l10n!.titleForm))),
-      body: Form(
-        key: validadFormulario,
-        child: Container(
-          margin: EdgeInsets.all(20),
-          child: Column(
-            children: [
-              Container(
-                margin: EdgeInsets.all(10),
-                child: Card(
-                  child: Container(
-                    margin: EdgeInsets.all(10),
-                    child: TextFormField(
-                      controller: controladorNombre,
-                      validator: (value) => context
-                          .read<FormularioViewmodel>()
-                          .validarNombre(value),
-                      decoration: InputDecoration(label: Text(l10n.nameForm)),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.all(10),
-                child: Card(
-                  child: Container(
-                    margin: EdgeInsets.all(10),
-                    child: FutureBuilder(
-                      future: context
-                          .read<DatabaseProvider>()
-                          .cargarCategorias(),
-                      builder: (context, snapshot) {
-                        final categorias = snapshot.data ?? [];
-                        return DropdownButtonFormField(
+      body: Semantics(
+        label: "Formulario para añadir un nuevo producto a la base de datos",
+        hint: "Formulario que se debe rellenar para añadir un nuevo producto",
+        child: Form(
+          key: validadFormulario,
+          child: Container(
+            margin: EdgeInsets.all(20),
+            child: Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.all(10),
+                  child: Card(
+                    child: Container(
+                      margin: EdgeInsets.all(10),
+                      child: Semantics(
+                        label: "Campo para introducir el nombre del producto",
+                        hint:
+                            "Campo donde se debe introducir el nombre del nuevo producto",
+                        child: TextFormField(
+                          controller: controladorNombre,
                           validator: (value) => context
                               .read<FormularioViewmodel>()
-                              .validarCategoria(value),
-                          hint: Text(l10n.selectCategoryForm),
-                          items: categorias
-                              .map(
-                                (categoria) => DropdownMenuItem(
-                                  value: categoria,
-                                  child: Text(categoria),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              categoriaSeleccionada = value;
-                            });
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.all(10),
-                child: Card(
-                  child: Container(
-                    margin: EdgeInsets.all(10),
-                    child: TextFormField(
-                      controller: controladorCantidad,
-                      validator: (value) => context
-                          .read<FormularioViewmodel>()
-                          .validarCantidad(value),
-                      decoration: InputDecoration(
-                        label: Text(l10n.quantityForm),
+                              .validarNombre(value),
+                          decoration: InputDecoration(
+                            label: Text(l10n.nameForm),
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              Container(
-                margin: EdgeInsets.all(10),
-                child: Card(
-                  child: Container(
-                    margin: EdgeInsets.all(10),
-                    child: TextFormField(
-                      controller: controladorPrecio,
-                      validator: (value) => context
-                          .read<FormularioViewmodel>()
-                          .validadPrecio(value),
-                      decoration: InputDecoration(label: Text(l10n.priceForm)),
+                Container(
+                  margin: EdgeInsets.all(10),
+                  child: Card(
+                    child: Container(
+                      margin: EdgeInsets.all(10),
+                      child: FutureBuilder(
+                        future: context
+                            .read<DatabaseProvider>()
+                            .cargarCategorias(),
+                        builder: (context, snapshot) {
+                          final categorias = snapshot.data ?? [];
+                          return Semantics(
+                            label: "Menú desplegable con las categorias",
+                            hint:
+                                "Se visualiza un menú desplegable donde se debe seleccionar la categoría del producto",
+                            child: DropdownButtonFormField(
+                              validator: (value) => context
+                                  .read<FormularioViewmodel>()
+                                  .validarCategoria(value),
+                              hint: Text(l10n.selectCategoryForm),
+                              items: categorias
+                                  .map(
+                                    (categoria) => DropdownMenuItem(
+                                      value: categoria,
+                                      child: Text(categoria),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  categoriaSeleccionada = value;
+                                });
+                              },
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Container(
-                margin: EdgeInsets.all(20),
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (validadFormulario.currentState!.validate()) {
-                      Producto nuevoProducto = Producto(
-                        idProducto: 0,
-                        nombre: controladorNombre.text,
-                        categoria: categoriaSeleccionada!,
-                        cantidad: int.parse(controladorCantidad.text),
-                        precio: double.parse(controladorPrecio.text),
-                      );
-                      context.read<DatabaseProvider>().anadirProducto(
-                        nuevoProducto,
-                      );
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: Text(l10n.addButtonForm),
+                Container(
+                  margin: EdgeInsets.all(10),
+                  child: Card(
+                    child: Container(
+                      margin: EdgeInsets.all(10),
+                      child: Semantics(
+                        label: "Campo donde se introduce la cantidad",
+                        hint:
+                            "Campo donde se debe introducir un número entero, que corresponde con la cantidad del producto",
+                        child: TextFormField(
+                          controller: controladorCantidad,
+                          validator: (value) => context
+                              .read<FormularioViewmodel>()
+                              .validarCantidad(value),
+                          decoration: InputDecoration(
+                            label: Text(l10n.quantityForm),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+                Container(
+                  margin: EdgeInsets.all(10),
+                  child: Card(
+                    child: Container(
+                      margin: EdgeInsets.all(10),
+                      child: Semantics(
+                        label: "Campo donde se introduce el precio",
+                        hint:
+                            "Campo donde se debe introducir un double, que corresponde con el precio del producto",
+                        child: TextFormField(
+                          controller: controladorPrecio,
+                          validator: (value) => context
+                              .read<FormularioViewmodel>()
+                              .validarPrecio(value),
+                          decoration: InputDecoration(
+                            label: Text(l10n.priceForm),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.all(20),
+                  child: Semantics(
+                    label: "Botón para añadir un producto",
+                    hint: "Botón para añadir un nuevo producto a la base de datos",
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (validadFormulario.currentState!.validate()) {
+                          Producto nuevoProducto = Producto(
+                            idProducto: 0,
+                            nombre: controladorNombre.text,
+                            categoria: categoriaSeleccionada!,
+                            cantidad: int.parse(controladorCantidad.text),
+                            precio: double.parse(controladorPrecio.text),
+                          );
+                          context.read<DatabaseProvider>().anadirProducto(
+                            nuevoProducto,
+                          );
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: Text(l10n.addButtonForm),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

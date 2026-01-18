@@ -26,7 +26,7 @@ class FormularioViewmodel extends ChangeNotifier {
     }
   }
 
-  String? validadPrecio(String? campo) {
+  String? validarPrecio(String? campo) {
     if (campo!.isEmpty || campo == null) {
       return "Precio vacio";
     } else if (double.tryParse(campo) == null) {

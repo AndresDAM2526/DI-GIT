@@ -34,13 +34,19 @@ class _AjustesState extends State<Ajustes> {
                     Text(l10n!.darkMode),
                     Container(
                       margin: EdgeInsets.only(left: 5),
-                      child: Switch(
-                        value: context.read<TemaViewmodel>().modoOscuro,
-                        onChanged: (value) {
-                          setState(() {
-                            context.read<TemaViewmodel>().cambiarTema();
-                          });
-                        },
+                      child: Semantics(
+                        label:
+                            "Switch que permite cambiar el tema al modo oscuro",
+                        hint:
+                            "Al activar el switch, todo el tema de la aplicación se cambia a modo oscuro",
+                        child: Switch(
+                          value: context.read<TemaViewmodel>().modoOscuro,
+                          onChanged: (value) {
+                            setState(() {
+                              context.read<TemaViewmodel>().cambiarTema();
+                            });
+                          },
+                        ),
                       ),
                     ),
                   ],
@@ -52,14 +58,19 @@ class _AjustesState extends State<Ajustes> {
                 margin: EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    Text(l10n!.fontSize),
-                    Slider(
-                      value: tamanio,
-                      onChanged: (value) {
-                        setState(() {
-                          tamanio = value;
-                        });
-                      },
+                    Text(l10n.fontSize),
+                    Semantics(
+                      label: "Permite cambiar el tamaño de la fuente",
+                      hint:
+                          "Al deslizar nos permite aumentar o disminuir el tamaño de la fuente",
+                      child: Slider(
+                        value: tamanio,
+                        onChanged: (value) {
+                          setState(() {
+                            tamanio = value;
+                          });
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -75,26 +86,32 @@ class _AjustesState extends State<Ajustes> {
                       margin: EdgeInsets.all(5),
                       child: Text(l10n!.language),
                     ),
-                    DropdownButton(
-                      key: keyDropDown,
-                      value: idiomaSeleccionado,
-                      items: idiomas.map((idioma) {
-                        return DropdownMenuItem<String>(
-                          value: idioma,
-                          child: Text(idioma),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          idiomaSeleccionado = value!;
-                          idiomaLocale = (idiomaSeleccionado == "es")
-                              ? "es"
-                              : "en";
-                          context.read<TemaViewmodel>().cambiarIdioma(
-                            idiomaLocale,
+                    Semantics(
+                      label:
+                          "Menú desplegable que permite cambiar el idioma de la aplicación",
+                      hint:
+                          "Menú que permite al usuario cambiar el idioma de la aplicación",
+                      child: DropdownButton(
+                        key: keyDropDown,
+                        value: idiomaSeleccionado,
+                        items: idiomas.map((idioma) {
+                          return DropdownMenuItem<String>(
+                            value: idioma,
+                            child: Text(idioma),
                           );
-                        });
-                      },
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            idiomaSeleccionado = value!;
+                            idiomaLocale = (idiomaSeleccionado == "es")
+                                ? "es"
+                                : "en";
+                            context.read<TemaViewmodel>().cambiarIdioma(
+                              idiomaLocale,
+                            );
+                          });
+                        },
+                      ),
                     ),
                   ],
                 ),

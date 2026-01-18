@@ -17,34 +17,43 @@ class Facturas extends StatelessWidget {
             return CircularProgressIndicator();
           }
           final facturas = snapshot.data!;
-          return ListView.builder(
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-              final factura = facturas[index];
-              return Container(
-                margin: EdgeInsets.all(10),
-                child: Card(
-                  child: ListTile(
-                    leading: Text(factura['idFactura'].toString()),
-                    title: Text(factura['fecha']),
-                    subtitle: Text(factura['total'].toString()),
-                    trailing: ElevatedButton(
-                      onPressed: () async {
-                        final productos = context
-                            .read<DatabaseProvider>()
-                            .productosFactura(factura['idFactura']);
-                        context.read<DatabaseProvider>().generarPDF(
-                          productos,
-                          factura['idFactura'],
-                          factura['fecha'],
-                        );
-                      },
-                      child: Text(l10n!.generatePDF),
+          return Semantics(
+            label: "Lista de las facturas",
+            hint: "Se visualiza la lista de facturas. En cada registro de se el identificador de la factura, la fecha y el importe total de la factura",
+            child: ListView.builder(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                final factura = facturas[index];
+                return Container(
+                  margin: EdgeInsets.all(10),
+                  child: Card(
+                    child: ListTile(
+                      leading: Text(factura['idFactura'].toString()),
+                      title: Text(factura['fecha']),
+                      subtitle: Text(factura['total'].toString()),
+                      trailing: Semantics(
+                        label: "Botón para generar un PDF con los datos de esa factura",
+                        hint: "Se genera un PDF con los datos de la factura",
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            final productos = context
+                                .read<DatabaseProvider>()
+                                .productosFactura(factura['idFactura']);
+                            context.read<DatabaseProvider>().generarPDF(
+                              productos,
+                              factura['idFactura'],
+                              factura['fecha'],
+                              factura['total']
+                            );
+                          },
+                          child: Text(l10n!.generatePDF),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         },
       ),

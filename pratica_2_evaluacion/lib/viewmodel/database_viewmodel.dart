@@ -231,6 +231,7 @@ class DatabaseProvider extends ChangeNotifier {
     Future<List<ProductoFactura>> productosFactura,
     int idFactura,
     String fecha,
+    double total,
   ) async {
     final productos = await productosFactura;
     final pdf = pw.Document();
@@ -281,6 +282,10 @@ class DatabaseProvider extends ChangeNotifier {
                     ),
                   ],
                 ),
+              ),
+              pw.Padding(
+                padding: pw.EdgeInsets.all(10),
+                child: pw.Container(child: pw.Text("Total: $total")),
               ),
             ],
           );
