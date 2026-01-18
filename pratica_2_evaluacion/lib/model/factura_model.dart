@@ -1,4 +1,4 @@
-import 'Producto.dart';
+import 'producto_model.dart';
 import 'dart:convert';
 
 class Factura {
