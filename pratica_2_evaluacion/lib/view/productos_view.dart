@@ -180,14 +180,23 @@ class Productos extends StatelessWidget {
       ),
       floatingActionButton: Semantics(
         label: "Botón para añadir un producto a la base de datos",
-        hint: "Al pulsar, se redirige al usuario a la pestaña donde se introducen los datos del nuevo producto",
+        hint:
+            "Al pulsar, se redirige al usuario a la pestaña donde se introducen los datos del nuevo producto",
         child: FloatingActionButton(
           tooltip: l10n.buttonAddProduct,
           onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(actions: [TextFormField()]);
+              },
+            );
+            /*
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => anadirProductos()),
             );
+            */
           },
           child: Icon(Icons.add_circle_sharp),
         ),

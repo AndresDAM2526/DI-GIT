@@ -5,8 +5,11 @@ class FormularioViewmodel extends ChangeNotifier {
   String nombre = "";
   String correo = "";
   String telefono = "";
+  final controladorNombre = TextEditingController();
+  final controladorCorreo = TextEditingController();
+  final controladorTelefono = TextEditingController();
 
-  String? validadNombre(String? valor) {
+  String? validarNombre(String? valor) {
     if (valor == null || valor.isEmpty) {
       return "El valor está vacio";
     }
@@ -14,9 +17,11 @@ class FormularioViewmodel extends ChangeNotifier {
     return null;
   }
 
-  String? validadCorreo(String? valor) {
+  String? validarCorreo(String? valor) {
     if (valor == null || valor.isEmpty) {
       return "El valor está vacio";
+    } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(valor)) {
+      return "El formato del correo es incorrecto";
     }
     //Esta bien
     return null;
@@ -34,9 +39,9 @@ class FormularioViewmodel extends ChangeNotifier {
   }
 
   void limpiarFormulario() {
-    nombre = "";
-    correo = "";
-    telefono = "";
+    controladorNombre.clear();
+    controladorCorreo.clear();
+    controladorTelefono.clear();
     notifyListeners();
   }
 
@@ -46,7 +51,7 @@ class FormularioViewmodel extends ChangeNotifier {
       correo: correo,
       tf: telefono,
     );
-    formularioModel.toString();
+    print(formularioModel.toString());
     notifyListeners();
   }
 }

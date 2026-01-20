@@ -9,7 +9,7 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (context) => FormularioViewmodel(),
-      child: MainApp(),
+      child:  MainApp(),
     ),
   );
 }
