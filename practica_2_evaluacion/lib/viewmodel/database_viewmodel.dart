@@ -130,6 +130,15 @@ class DatabaseProvider extends ChangeNotifier {
         .toList();
   }
 
+  Future<void> buscarProductosPorNombre(String nombre) async {
+    final db = await database;
+    _productos = await db.rawQuery(
+      'SELECT p.idProducto,p.nombre,c.categoria as categoria,p.cantidad,p.precio FROM producto p INNER JOIN categoria c ON c.idCategoria=p.idCategoria WHERE p.nombre LIKE ?',
+      ['%$nombre%'],
+    );
+    notifyListeners();
+  }
+
   Future<void> cargarProductos() async {
     final db = await database;
     _productos = await db.rawQuery(
