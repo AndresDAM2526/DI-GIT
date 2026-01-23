@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:pratica_2_evaluacion/l10n/app_localizations.dart';
-import 'package:pratica_2_evaluacion/view/ajustes_view.dart';
-import 'package:pratica_2_evaluacion/view/facturas_view.dart';
-import 'package:pratica_2_evaluacion/view/productos_view.dart';
-import 'package:pratica_2_evaluacion/viewmodel/database_viewmodel.dart';
-import 'package:pratica_2_evaluacion/viewmodel/formulario_viewmodel.dart';
-import 'package:pratica_2_evaluacion/viewmodel/tema_viewmodel.dart';
+import 'package:practica_2_evaluacion/l10n/app_localizations.dart';
+import 'package:practica_2_evaluacion/view/ajustes_view.dart';
+import 'package:practica_2_evaluacion/view/facturas_view.dart';
+import 'package:practica_2_evaluacion/view/productos_view.dart';
+import 'package:practica_2_evaluacion/viewmodel/database_viewmodel.dart';
+import 'package:practica_2_evaluacion/viewmodel/formulario_viewmodel.dart';
+import 'package:practica_2_evaluacion/viewmodel/tema_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 

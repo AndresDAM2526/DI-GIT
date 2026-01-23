@@ -96,7 +96,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get darkMode => 'Modo oscuro';
 
   @override
-  String get fontSize => 'tamaño de la fuente';
+  String get fontSize => 'Tamaño de la fuente';
 
   @override
   String get language => 'Idioma';

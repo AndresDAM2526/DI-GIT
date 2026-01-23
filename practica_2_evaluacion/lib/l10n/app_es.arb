@@ -28,6 +28,6 @@
     "generatePDF": "Generar PDF",
     "setingsTitle": "Ajustes",
     "darkMode" : "Modo oscuro",
-    "fontSize" : "tamaño de la fuente",
+    "fontSize" : "Tamaño de la fuente",
     "language" : "Idioma"
 }

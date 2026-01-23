@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pratica_2_evaluacion/l10n/app_localizations.dart';
-import 'package:pratica_2_evaluacion/main.dart';
-import 'package:pratica_2_evaluacion/model/producto_model.dart';
-import 'package:pratica_2_evaluacion/viewmodel/database_viewmodel.dart';
-import 'package:pratica_2_evaluacion/viewmodel/formulario_viewmodel.dart';
+import 'package:practica_2_evaluacion/l10n/app_localizations.dart';
+import 'package:practica_2_evaluacion/model/producto_model.dart';
+import 'package:practica_2_evaluacion/viewmodel/database_viewmodel.dart';
+import 'package:practica_2_evaluacion/viewmodel/formulario_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 class anadirProductos extends StatefulWidget {
