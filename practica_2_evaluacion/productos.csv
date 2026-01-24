@@ -1,0 +1,22 @@
+nombre,categoria,cantidad,precio
+Tarjeta Grafica RTX 4070,Hardware,15,650.00
+Procesador Intel i7-13700K,Hardware,22,420.50
+Memoria RAM 32GB DDR5,Hardware,40,125.99
+Placa Base Z790,Hardware,10,210.00
+Disco SSD NVMe 2TB,Hardware,55,160.00
+Teclado Mecanico RGB,Perifericos,30,85.50
+Raton Gaming Optico,Perifericos,45,45.00
+Monitor 27 Pulgadas 144Hz,Perifericos,12,299.99
+Alfombrilla XL,Perifericos,100,19.90
+Auriculares Inalambricos Noise Cancelling,audio,25,180.00
+Barra de Sonido 2.1,audio,18,120.00
+Altavoz Bluetooth Portatil,audio,60,55.00
+Microfono Condensador USB,audio,14,95.00
+iPhone 15 Pro,smarthpone,8,1200.00
+Samsung Galaxy S23,smarthpone,12,850.00
+Xiaomi Redmi Note 12,smarthpone,50,220.00
+Google Pixel 8,smarthpone,10,750.00
+Router WiFi 6 AX3000,redes,20,89.90
+Switch Gigabit 8 Puertos,redes,35,30.00
+Repetidor WiFi de Pared,redes,50,25.00
+Cable Ethernet Cat7 10m,redes,80,15.50

@@ -62,7 +62,7 @@ class _anadirProductosState extends State<anadirProductos> {
                       child: FutureBuilder(
                         future: context
                             .read<DatabaseProvider>()
-                            .cargarCategorias(),
+                            .mostrarCategorias(),
                         builder: (context, snapshot) {
                           final categorias = snapshot.data ?? [];
                           return Semantics(

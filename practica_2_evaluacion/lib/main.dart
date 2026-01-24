@@ -4,11 +4,11 @@ import 'package:practica_2_evaluacion/l10n/app_localizations.dart';
 import 'package:practica_2_evaluacion/view/ajustes_view.dart';
 import 'package:practica_2_evaluacion/view/facturas_view.dart';
 import 'package:practica_2_evaluacion/view/productos_view.dart';
+import 'package:practica_2_evaluacion/viewmodel/csv_viewmodel.dart';
 import 'package:practica_2_evaluacion/viewmodel/database_viewmodel.dart';
 import 'package:practica_2_evaluacion/viewmodel/formulario_viewmodel.dart';
 import 'package:practica_2_evaluacion/viewmodel/tema_viewmodel.dart';
 import 'package:provider/provider.dart';
-
 
 void main() {
   runApp(
@@ -17,6 +17,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => DatabaseProvider()),
         ChangeNotifierProvider(create: (context) => FormularioViewmodel()),
         ChangeNotifierProvider(create: (context) => TemaViewmodel()),
+        ChangeNotifierProvider(create: (context) => CsvViewmodel(),)
       ],
       child: MainApp(),
     ),
@@ -55,6 +56,7 @@ class _MainAppState extends State<MainApp> {
               final l10n = AppLocalizations.of(context);
               return Scaffold(
                 bottomNavigationBar: BottomNavigationBar(
+                  currentIndex: indicePagina,
                   onTap: (value) {
                     setState(() {
                       indicePagina = value;

@@ -58,7 +58,7 @@ class _modificarProductoState extends State<modificarProducto> {
                   child: Container(
                     margin: EdgeInsets.all(10),
                     child: FutureBuilder(
-                      future: context.read<DatabaseProvider>().cargarCategorias(),
+                      future: context.read<DatabaseProvider>().mostrarCategorias(),
                       builder: (context, snapshot) {
                         if(snapshot.connectionState==ConnectionState.waiting){
                           return CircularProgressIndicator();

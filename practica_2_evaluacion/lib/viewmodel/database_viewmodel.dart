@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
+import 'package:practica_2_evaluacion/model/producto_csv.dart';
 import 'package:practica_2_evaluacion/model/producto_factura_model.dart';
 import 'package:practica_2_evaluacion/model/producto_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,11 +17,14 @@ class DatabaseProvider extends ChangeNotifier {
   List<Map<String, dynamic>> get productos => _productos;
   List<Map<String, dynamic>> _categorias = [];
   List<Map<String, dynamic>> get categorias => _categorias;
+  List<Map<String, dynamic>> _productosFiltrados = [];
+  List<Map<String, dynamic>> get productosFiltrados => _productosFiltrados;
   late final Future<Database> database;
 
   DatabaseProvider() {
     database = _loadDatabase();
     cargarProductos();
+    cargarCategorias();
     obtenerDatosCarrito();
   }
 
@@ -122,17 +126,51 @@ class DatabaseProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<String>> cargarCategorias() async {
+  Future<void> anadirProductoCsv(ProductoCsv productoCsv) async {
+    final db = await database;
+    int idCategoria = await obtenerIdCategoria(productoCsv.categoria);
+    await db.insert('producto', {
+      'nombre': productoCsv.nombre,
+      'idCategoria': idCategoria,
+      'cantidad': productoCsv.cantidad,
+      'precio': productoCsv.precio,
+    });
+    cargarProductos();
+    notifyListeners();
+  }
+
+  void anadirProductosCsv(Future<List<List<dynamic>>> datos) async {
+    final productos = await datos;
+    for (int i = 1; i < productos.length; i++) {
+      final fila = productos[i];
+      ProductoCsv productoCsv = ProductoCsv(
+        nombre: fila[0],
+        categoria: fila[1],
+        cantidad: fila[2],
+        precio: fila[3],
+      );
+      anadirProductoCsv(productoCsv);
+    }
+  }
+
+  Future<List<String>> mostrarCategorias() async {
     final db = await database;
     _categorias = await db.query('categoria', columns: ['categoria']);
+    notifyListeners();
     return _categorias
         .map((categoria) => categoria['categoria'].toString())
         .toList();
   }
 
+  Future<void> cargarCategorias() async {
+    final db = await database;
+    _categorias = await db.query('categoria', columns: ['categoria']);
+    notifyListeners();
+  }
+
   Future<void> buscarProductosPorNombre(String nombre) async {
     final db = await database;
-    _productos = await db.rawQuery(
+    _productosFiltrados = await db.rawQuery(
       'SELECT p.idProducto,p.nombre,c.categoria as categoria,p.cantidad,p.precio FROM producto p INNER JOIN categoria c ON c.idCategoria=p.idCategoria WHERE p.nombre LIKE ?',
       ['%$nombre%'],
     );
@@ -143,6 +181,15 @@ class DatabaseProvider extends ChangeNotifier {
     final db = await database;
     _productos = await db.rawQuery(
       'SELECT p.idProducto,p.nombre,c.categoria as categoria,p.cantidad,p.precio FROM producto p INNER JOIN categoria c ON c.idCategoria=p.idCategoria',
+    );
+    notifyListeners();
+  }
+
+  Future<void> filtrarProductosPorCategoria(String categoria) async {
+    final db = await database;
+    _productosFiltrados = await db.rawQuery(
+      'SELECT p.idProducto,p.nombre,c.categoria as categoria,p.cantidad,p.precio FROM producto p INNER JOIN categoria c ON c.idCategoria=p.idCategoria WHERE c.categoria=?',
+      [categoria],
     );
     notifyListeners();
   }
