@@ -168,12 +168,23 @@ class DatabaseProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> buscarProductosPorNombre(String nombre) async {
+  Future<void> buscarProductosPorNombre(
+    String nombre,
+    String opcionsSeleccionada,
+  ) async {
     final db = await database;
-    _productosFiltrados = await db.rawQuery(
-      'SELECT p.idProducto,p.nombre,c.categoria as categoria,p.cantidad,p.precio FROM producto p INNER JOIN categoria c ON c.idCategoria=p.idCategoria WHERE p.nombre LIKE ?',
-      ['%$nombre%'],
-    );
+    if (opcionsSeleccionada == "Todos") {
+      _productos = await db.rawQuery(
+        'SELECT p.idProducto,p.nombre,c.categoria as categoria,p.cantidad,p.precio FROM producto p INNER JOIN categoria c ON c.idCategoria=p.idCategoria WHERE p.nombre LIKE ?',
+        ['%$nombre%'],
+      );
+    } else {
+      _productosFiltrados = await db.rawQuery(
+        'SELECT p.idProducto,p.nombre,c.categoria as categoria,p.cantidad,p.precio FROM producto p INNER JOIN categoria c ON c.idCategoria=p.idCategoria WHERE p.nombre LIKE ?',
+        ['%$nombre%'],
+      );
+    }
+
     notifyListeners();
   }
 

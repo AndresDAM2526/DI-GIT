@@ -101,10 +101,18 @@ class _ProductosState extends State<Productos> {
             Container(
               margin: EdgeInsets.all(20),
               child: TextField(
-                onSubmitted: (value) {
-                  context.read<DatabaseProvider>().buscarProductosPorNombre(
-                    value,
-                  );
+                onChanged: (value) {
+                  if (botonSeleccionado == "Todos") {
+                    context.read<DatabaseProvider>().buscarProductosPorNombre(
+                      value,
+                      "Todos",
+                    );
+                  } else {
+                    context.read<DatabaseProvider>().buscarProductosPorNombre(
+                      value,
+                      "Filtrar",
+                    );
+                  }
                 },
                 decoration: InputDecoration(
                   label: Text("Buscar por nombre"),
@@ -142,101 +150,254 @@ class _ProductosState extends State<Productos> {
                   "Se visualizan todos los productos disponibles en la tienda en formato de tabla. Las columnas de la tabla son nombre, categoria,cantidad y precio del producto",
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  columns: [
-                    DataColumn(label: Text("")),
-                    DataColumn(label: Text(l10n.tableName)),
-                    DataColumn(label: Text(l10n.tableCategory)),
-                    DataColumn(label: Text(l10n.tableQuantity)),
-                    DataColumn(label: Text(l10n.tablePrice)),
-                    DataColumn(label: Text("")),
-                  ],
-                  rows: productosFiltrados
-                      .map(
-                        (producto) => DataRow(
-                          cells: [
-                            DataCell(
-                              Row(
-                                children: [
-                                  OutlinedButton(
-                                    onPressed: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return Dialog(
-                                            child: modificarProducto(
-                                              idProducto:
+                child: botonSeleccionado == "Todos"
+                    ? DataTable(
+                        columns: [
+                          DataColumn(label: Text("")),
+                          DataColumn(label: Text(l10n.tableName)),
+                          DataColumn(label: Text(l10n.tableCategory)),
+                          DataColumn(label: Text(l10n.tableQuantity)),
+                          DataColumn(label: Text(l10n.tablePrice)),
+                          DataColumn(label: Text("")),
+                        ],
+                        rows: productos
+                            .map(
+                              (producto) => DataRow(
+                                cells: [
+                                  DataCell(
+                                    Row(
+                                      children: [
+                                        OutlinedButton(
+                                          onPressed: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return Dialog(
+                                                  child: modificarProducto(
+                                                    idProducto:
+                                                        producto['idProducto'],
+                                                  ),
+                                                );
+                                              },
+                                            );
+                                          },
+                                          child: Icon(Icons.edit),
+                                        ),
+                                        OutlinedButton(
+                                          onPressed: () {
+                                            context
+                                                .read<DatabaseProvider>()
+                                                .borrarProducto(
                                                   producto['idProducto'],
+                                                );
+                                          },
+                                          child: Icon(Icons.remove),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  DataCell(Text(producto['nombre'])),
+                                  DataCell(Text(producto['categoria'])),
+                                  DataCell(
+                                    Text(producto['cantidad'].toString()),
+                                  ),
+                                  DataCell(Text(producto['precio'].toString())),
+                                  DataCell(
+                                    Row(
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.all(10),
+                                          child: Semantics(
+                                            label:
+                                                "Botón para añadir un producto al carrito",
+                                            hint:
+                                                "Se añade el producto seleccionado al carrito",
+                                            child: FloatingActionButton(
+                                              tooltip: l10n.tableAddProduct,
+                                              heroTag:
+                                                  "anadir-${producto['nombre']}",
+                                              onPressed: () async {
+                                                int cantidad = await showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    TextEditingController?
+                                                    cantidadSeleccionada;
+                                                    return AlertDialog(
+                                                      title: Text("Cantidad"),
+                                                      actions: [
+                                                        Column(
+                                                          children: [
+                                                            TextField(
+                                                              controller:
+                                                                  cantidadSeleccionada,
+                                                            ),
+                                                            ElevatedButton(
+                                                              onPressed: () {
+                                                                if (double.tryParse(
+                                                                      cantidadSeleccionada!
+                                                                          .text,
+                                                                    ) !=
+                                                                    null) {
+                                                                  Navigator.pop(
+                                                                    context,
+                                                                    double.parse(
+                                                                      cantidadSeleccionada
+                                                                          .text,
+                                                                    ),
+                                                                  );
+                                                                } else {
+                                                                  print(
+                                                                    "Incorrecto",
+                                                                  );
+                                                                }
+                                                              },
+                                                              child: Text(
+                                                                "Confirmar",
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    );
+                                                  },
+                                                );
+                                                int idProducto =
+                                                    producto['idProducto'];
+                                                String nombre =
+                                                    producto['nombre'];
+                                                String categoria =
+                                                    producto['categoria'];
+
+                                                double precio =
+                                                    producto['precio'];
+                                                Producto nuevoProducto =
+                                                    Producto(
+                                                      idProducto: idProducto,
+                                                      nombre: nombre,
+                                                      categoria: categoria,
+                                                      cantidad: cantidad,
+                                                      precio: precio,
+                                                    );
+                                                context
+                                                    .read<DatabaseProvider>()
+                                                    .anadirProductoCarrito(
+                                                      nuevoProducto,
+                                                    );
+                                              },
+                                              child: Icon(Icons.shopping_cart),
                                             ),
-                                          );
-                                        },
-                                      );
-                                    },
-                                    child: Icon(Icons.edit),
-                                  ),
-                                  OutlinedButton(
-                                    onPressed: () {
-                                      context
-                                          .read<DatabaseProvider>()
-                                          .borrarProducto(
-                                            producto['idProducto'],
-                                          );
-                                    },
-                                    child: Icon(Icons.remove),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            DataCell(Text(producto['nombre'])),
-                            DataCell(Text(producto['categoria'])),
-                            DataCell(Text(producto['cantidad'].toString())),
-                            DataCell(Text(producto['precio'].toString())),
-                            DataCell(
-                              Row(
-                                children: [
-                                  Container(
-                                    margin: EdgeInsets.all(10),
-                                    child: Semantics(
-                                      label:
-                                          "Botón para añadir un producto al carrito",
-                                      hint:
-                                          "Se añade el producto seleccionado al carrito",
-                                      child: FloatingActionButton(
-                                        tooltip: l10n.tableAddProduct,
-                                        heroTag: "anadir-${producto['nombre']}",
-                                        onPressed: () {
-                                          int idProducto =
-                                              producto['idProducto'];
-                                          String nombre = producto['nombre'];
-                                          String categoria =
-                                              producto['categoria'];
-                                          int cantidad = producto['cantidad'];
-                                          double precio = producto['precio'];
-                                          Producto nuevoProducto = Producto(
-                                            idProducto: idProducto,
-                                            nombre: nombre,
-                                            categoria: categoria,
-                                            cantidad: cantidad,
-                                            precio: precio,
-                                          );
-                                          context
-                                              .read<DatabaseProvider>()
-                                              .anadirProductoCarrito(
-                                                nuevoProducto,
-                                              );
-                                        },
-                                        child: Icon(Icons.shopping_cart),
-                                      ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
+                            )
+                            .toList(),
                       )
-                      .toList(),
-                ),
+                    : DataTable(
+                        columns: [
+                          DataColumn(label: Text("")),
+                          DataColumn(label: Text(l10n.tableName)),
+                          DataColumn(label: Text(l10n.tableCategory)),
+                          DataColumn(label: Text(l10n.tableQuantity)),
+                          DataColumn(label: Text(l10n.tablePrice)),
+                          DataColumn(label: Text("")),
+                        ],
+                        rows: productosFiltrados
+                            .map(
+                              (producto) => DataRow(
+                                cells: [
+                                  DataCell(
+                                    Row(
+                                      children: [
+                                        OutlinedButton(
+                                          onPressed: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return Dialog(
+                                                  child: modificarProducto(
+                                                    idProducto:
+                                                        producto['idProducto'],
+                                                  ),
+                                                );
+                                              },
+                                            );
+                                          },
+                                          child: Icon(Icons.edit),
+                                        ),
+                                        OutlinedButton(
+                                          onPressed: () {
+                                            context
+                                                .read<DatabaseProvider>()
+                                                .borrarProducto(
+                                                  producto['idProducto'],
+                                                );
+                                          },
+                                          child: Icon(Icons.remove),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  DataCell(Text(producto['nombre'])),
+                                  DataCell(Text(producto['categoria'])),
+                                  DataCell(
+                                    Text(producto['cantidad'].toString()),
+                                  ),
+                                  DataCell(Text(producto['precio'].toString())),
+                                  DataCell(
+                                    Row(
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.all(10),
+                                          child: Semantics(
+                                            label:
+                                                "Botón para añadir un producto al carrito",
+                                            hint:
+                                                "Se añade el producto seleccionado al carrito",
+                                            child: FloatingActionButton(
+                                              tooltip: l10n.tableAddProduct,
+                                              heroTag:
+                                                  "anadir-${producto['nombre']}",
+                                              onPressed: () {
+                                                int idProducto =
+                                                    producto['idProducto'];
+                                                String nombre =
+                                                    producto['nombre'];
+                                                String categoria =
+                                                    producto['categoria'];
+                                                int cantidad =
+                                                    producto['cantidad'];
+                                                double precio =
+                                                    producto['precio'];
+                                                Producto nuevoProducto =
+                                                    Producto(
+                                                      idProducto: idProducto,
+                                                      nombre: nombre,
+                                                      categoria: categoria,
+                                                      cantidad: cantidad,
+                                                      precio: precio,
+                                                    );
+                                                context
+                                                    .read<DatabaseProvider>()
+                                                    .anadirProductoCarrito(
+                                                      nuevoProducto,
+                                                    );
+                                              },
+                                              child: Icon(Icons.shopping_cart),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                            .toList(),
+                      ),
               ),
             ),
           ],

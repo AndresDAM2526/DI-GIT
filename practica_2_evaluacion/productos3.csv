@@ -1,0 +1,21 @@
+nombre,categoria,cantidad,precio
+Laptop Pro,Hardware,10,1200.50
+Raton Optico,Hardware,50,25.00
+Monitor 27,Hardware,15,299.99
+Teclado Mecanico,Hardware,20,85.00
+Disco SSD 1TB,Hardware,30,110.00
+Silla Ergonomica,Muebles,12,180.00
+Mesa Elevable,Muebles,5,350.00
+Flexo LED,Muebles,25,29.99
+Estanteria,Muebles,8,75.00
+Alfombra Raton,Muebles,100,12.50
+Auriculares BT,Audio,40,55.00
+Microfono Cardioide,Audio,10,145.00
+Altavoces 2.1,Audio,15,89.00
+Cable HDMI,Accesorios,200,8.50
+Hub USB-C,Accesorios,45,35.00
+Funda Portatil,Accesorios,30,19.99
+Webcam 1080p,Hardware,18,65.00
+Adaptador Red,Accesorios,50,15.00
+Tarjeta SD 64GB,Accesorios,80,22.00
+Soporte Monitor,Muebles,22,45.00
