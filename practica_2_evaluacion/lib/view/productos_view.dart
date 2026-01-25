@@ -6,6 +6,7 @@ import 'package:practica_2_evaluacion/l10n/app_localizations.dart';
 import 'package:practica_2_evaluacion/model/producto_model.dart';
 import 'package:practica_2_evaluacion/view/anadir_productos_view.dart';
 import 'package:practica_2_evaluacion/view/carrito_view.dart';
+import 'package:practica_2_evaluacion/view/modificar_producto_view.dart';
 import 'package:practica_2_evaluacion/viewmodel/csv_viewmodel.dart';
 import 'package:practica_2_evaluacion/viewmodel/database_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,7 @@ class Productos extends StatefulWidget {
 
 class _ProductosState extends State<Productos> {
   int indiceCategoria = 0;
+  String? botonSeleccionado;
   @override
   Widget build(BuildContext context) {
     final productos = context.watch<DatabaseProvider>().productos;
@@ -42,6 +44,7 @@ class _ProductosState extends State<Productos> {
     return Scaffold(
       appBar: AppBar(title: Center(child: Text(l10n!.stockTitle))),
       body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
         child: Column(
           children: [
             Row(
@@ -66,6 +69,35 @@ class _ProductosState extends State<Productos> {
                 ),
               ],
             ),
+            //Filtro principal->Mostrar todos, filtrar
+            Container(
+              margin: EdgeInsets.all(2),
+              child: Column(
+                children: [
+                  RadioGroup(
+                    onChanged: (value) {
+                      setState(() {
+                        botonSeleccionado = value;
+                      });
+                    },
+                    groupValue: botonSeleccionado,
+                    child: Column(
+                      children: [
+                        ListTile(
+                          leading: Radio(value: "Todos"),
+                          title: Text("Mostrar todos"),
+                        ),
+                        ListTile(
+                          leading: Radio(value: "Filtrar"),
+                          title: Text("Filtrar"),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            //Buscador
             Container(
               margin: EdgeInsets.all(20),
               child: TextField(
@@ -82,120 +114,135 @@ class _ProductosState extends State<Productos> {
             ),
             Container(
               margin: EdgeInsets.all(12),
-              child: categorias.isEmpty
-                  ? Center(child: CircularProgressIndicator())
-                  : ToggleButtons(
-                      fillColor: Colors.green,
-                      isSelected: toggle,
-                      onPressed: (index) {
-                        setState(() {
-                          indiceCategoria = index;
-                          context
-                              .read<DatabaseProvider>()
-                              .filtrarProductosPorCategoria(
-                                categorias[index]['categoria'],
-                              );
-                        });
-                      },
-                      children: elementoToggle,
-                    ),
+              child: botonSeleccionado == "Filtrar"
+                  ? categorias.isEmpty
+                        ? Center(child: CircularProgressIndicator())
+                        : ToggleButtons(
+                            fillColor: Colors.green,
+                            isSelected: toggle,
+                            onPressed: (index) {
+                              setState(() {
+                                indiceCategoria = index;
+                                context
+                                    .read<DatabaseProvider>()
+                                    .filtrarProductosPorCategoria(
+                                      categorias[index]['categoria'],
+                                    );
+                              });
+                            },
+                            children: elementoToggle,
+                          )
+                  : null,
             ),
+            //Tabla de productos
             Semantics(
               label:
                   "Tabla en la que se muestran todos los productos disponibles en la tienda",
               hint:
                   "Se visualizan todos los productos disponibles en la tienda en formato de tabla. Las columnas de la tabla son nombre, categoria,cantidad y precio del producto",
-              child: DataTable(
-                columns: [
-                  DataColumn(label: Text("")),
-                  DataColumn(label: Text(l10n.tableName)),
-                  DataColumn(label: Text(l10n.tableCategory)),
-                  DataColumn(label: Text(l10n.tableQuantity)),
-                  DataColumn(label: Text(l10n.tablePrice)),
-                  DataColumn(label: Text("")),
-                ],
-                rows: productosFiltrados
-                    .map(
-                      (producto) => DataRow(
-                        cells: [
-                          DataCell(
-                            Row(
-                              children: [
-                                OutlinedButton(
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return Dialog(child: anadirProductos());
-                                      },
-                                    );
-                                  },
-                                  child: Icon(Icons.edit),
-                                ),
-                                OutlinedButton(
-                                  onPressed: () {
-                                    context
-                                        .read<DatabaseProvider>()
-                                        .borrarProducto(producto['idProducto']);
-                                  },
-                                  child: Icon(Icons.remove),
-                                ),
-                              ],
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  columns: [
+                    DataColumn(label: Text("")),
+                    DataColumn(label: Text(l10n.tableName)),
+                    DataColumn(label: Text(l10n.tableCategory)),
+                    DataColumn(label: Text(l10n.tableQuantity)),
+                    DataColumn(label: Text(l10n.tablePrice)),
+                    DataColumn(label: Text("")),
+                  ],
+                  rows: productosFiltrados
+                      .map(
+                        (producto) => DataRow(
+                          cells: [
+                            DataCell(
+                              Row(
+                                children: [
+                                  OutlinedButton(
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return Dialog(
+                                            child: modificarProducto(
+                                              idProducto:
+                                                  producto['idProducto'],
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Icon(Icons.edit),
+                                  ),
+                                  OutlinedButton(
+                                    onPressed: () {
+                                      context
+                                          .read<DatabaseProvider>()
+                                          .borrarProducto(
+                                            producto['idProducto'],
+                                          );
+                                    },
+                                    child: Icon(Icons.remove),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          DataCell(Text(producto['nombre'])),
-                          DataCell(Text(producto['categoria'])),
-                          DataCell(Text(producto['cantidad'].toString())),
-                          DataCell(Text(producto['precio'].toString())),
-                          DataCell(
-                            Row(
-                              children: [
-                                Container(
-                                  margin: EdgeInsets.all(10),
-                                  child: Semantics(
-                                    label:
-                                        "Botón para añadir un producto al carrito",
-                                    hint:
-                                        "Se añade el producto seleccionado al carrito",
-                                    child: FloatingActionButton(
-                                      tooltip: l10n.tableAddProduct,
-                                      heroTag: "anadir-${producto['nombre']}",
-                                      onPressed: () {
-                                        int idProducto = producto['idProducto'];
-                                        String nombre = producto['nombre'];
-                                        String categoria =
-                                            producto['categoria'];
-                                        int cantidad = producto['cantidad'];
-                                        double precio = producto['precio'];
-                                        Producto nuevoProducto = Producto(
-                                          idProducto: idProducto,
-                                          nombre: nombre,
-                                          categoria: categoria,
-                                          cantidad: cantidad,
-                                          precio: precio,
-                                        );
-                                        context
-                                            .read<DatabaseProvider>()
-                                            .anadirProductoCarrito(
-                                              nuevoProducto,
-                                            );
-                                      },
-                                      child: Icon(Icons.shopping_cart),
+                            DataCell(Text(producto['nombre'])),
+                            DataCell(Text(producto['categoria'])),
+                            DataCell(Text(producto['cantidad'].toString())),
+                            DataCell(Text(producto['precio'].toString())),
+                            DataCell(
+                              Row(
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.all(10),
+                                    child: Semantics(
+                                      label:
+                                          "Botón para añadir un producto al carrito",
+                                      hint:
+                                          "Se añade el producto seleccionado al carrito",
+                                      child: FloatingActionButton(
+                                        tooltip: l10n.tableAddProduct,
+                                        heroTag: "anadir-${producto['nombre']}",
+                                        onPressed: () {
+                                          int idProducto =
+                                              producto['idProducto'];
+                                          String nombre = producto['nombre'];
+                                          String categoria =
+                                              producto['categoria'];
+                                          int cantidad = producto['cantidad'];
+                                          double precio = producto['precio'];
+                                          Producto nuevoProducto = Producto(
+                                            idProducto: idProducto,
+                                            nombre: nombre,
+                                            categoria: categoria,
+                                            cantidad: cantidad,
+                                            precio: precio,
+                                          );
+                                          context
+                                              .read<DatabaseProvider>()
+                                              .anadirProductoCarrito(
+                                                nuevoProducto,
+                                              );
+                                        },
+                                        child: Icon(Icons.shopping_cart),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    )
-                    .toList(),
+                          ],
+                        ),
+                      )
+                      .toList(),
+                ),
               ),
             ),
           ],
         ),
       ),
+      //Botones inferiores
       floatingActionButton: Semantics(
         label: "Botón para añadir un producto a la base de datos",
         hint:
