@@ -20,7 +20,7 @@ class FormularioViewmodel extends ChangeNotifier {
     } else if (valor.length != 9) {
       return "Longitud del teléfono incorrecta";
     } else if (int.tryParse(valor) == null) {
-      return "Formato del número incorrecto";
+      return "Formato del teléfono incorrecto";
     }
   }
 

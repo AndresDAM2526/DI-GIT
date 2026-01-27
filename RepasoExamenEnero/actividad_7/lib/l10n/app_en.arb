@@ -1,0 +1,7 @@
+{
+    "appBarTitle": "Registration Form",
+    "name": "Name",
+    "telephone": "Phone Number",
+    "submit": "Submit",
+    "clear": "Clear fields"
+}

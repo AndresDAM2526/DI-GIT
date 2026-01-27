@@ -1,0 +1,7 @@
+{
+    "appBarTitle": "Formulario de registro",
+    "name": "Nombre",
+    "telephone": "Teléfono",
+    "submit": "Enviar",
+    "clear": "Vaciar campos"
+}
