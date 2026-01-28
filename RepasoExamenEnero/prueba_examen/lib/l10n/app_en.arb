@@ -1,0 +1,12 @@
+{
+    "menu": "Menu",
+    "conversor": "Converter",
+    "transacciones": "Transactions",
+    "ajustes": "Settings",
+    "textoFormField": "Enter the value",
+    "textoBoton": "Convert and save",
+    "modoOscuro": "Dark mode",
+    "idioma": "Language",
+    "tamanoTexto": "Font size",
+    "textoSnackbar": "Transaction saved successfully"
+}

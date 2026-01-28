@@ -5,9 +5,12 @@ import 'package:path/path.dart';
 
 class DatabaseViewmodel extends ChangeNotifier {
   late final Future<Database> database;
+  List<Map<String, dynamic>> _transacciones = [];
+  List<Map<String, dynamic>> get transacciones => _transacciones;
 
   DatabaseViewmodel() {
     database = _cargarBBDD();
+    obtenerTransacciones();
   }
 
   Future<Database> _cargarBBDD() async {
@@ -43,5 +46,24 @@ class DatabaseViewmodel extends ChangeNotifier {
       'unidad_final': transaccion.unidadFinal,
       'valor_final': transaccion.valorFinal,
     });
+    obtenerTransacciones();
+    notifyListeners();
+  }
+
+  Future<void> obtenerTransacciones() async {
+    final db = await database;
+    _transacciones = await db.query('conversion');
+    notifyListeners();
+  }
+
+  Future<void> borrarTransaccion(int idTransaccion) async {
+    final db = await database;
+    await db.delete(
+      'conversion',
+      where: 'id_conversion=?',
+      whereArgs: [idTransaccion],
+    );
+    obtenerTransacciones();
+    notifyListeners();
   }
 }

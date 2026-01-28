@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:prueba_examen/l10n/app_localizations.dart';
+import 'package:prueba_examen/viewmodel/tema_viewmodel.dart';
 
 class AjustesView extends StatefulWidget {
   const AjustesView({super.key});
@@ -13,21 +16,30 @@ class _AjustesViewState extends State<AjustesView> {
   double valorSlider = 0;
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final viewModel = context.watch<TemaViewmodel>();
     return Scaffold(
-      appBar: AppBar(title: Center(child: Text("Ajustes"))),
+      appBar: AppBar(title: Center(child: Text(l10n!.ajustes))),
       body: ListView(
         children: [
           Card(
             child: ListTile(
-              title: Text("Modo oscuro"),
-              trailing: Switch(value: false, onChanged: (value) => false),
+              title: Text(l10n.modoOscuro),
+              trailing: Switch(
+                value: viewModel.modoOscuro,
+                onChanged: (value) {
+                  setState(() {
+                    viewModel.cambiarTema();
+                  });
+                },
+              ),
             ),
           ),
           Card(
             child: ListTile(
-              title: Text("Idioma"),
+              title: Text(l10n.idioma),
               trailing: DropdownButton(
-                hint: Text("Idioma"),
+                hint: Text(viewModel.idioma),
                 value: idiomaSeleccionado,
                 items: idiomas
                     .map(
@@ -37,7 +49,7 @@ class _AjustesViewState extends State<AjustesView> {
                     .toList(),
                 onChanged: (value) {
                   setState(() {
-                    idiomaSeleccionado = value!;
+                    viewModel.cambiarIdioma(value!);
                   });
                 },
               ),
@@ -45,13 +57,15 @@ class _AjustesViewState extends State<AjustesView> {
           ),
           Card(
             child: ListTile(
-              title: Text("Modo oscuro"),
+              title: Text(l10n.tamanoTexto),
               subtitle: Slider(
+                min: 10.0,
+                max: 50.0,
                 divisions: 4,
-                value: valorSlider,
+                value: viewModel.tamanio,
                 onChanged: (value) {
                   setState(() {
-                    valorSlider = value;
+                    viewModel.cambiarTamanio(value);
                   });
                 },
               ),

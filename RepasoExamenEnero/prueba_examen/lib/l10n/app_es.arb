@@ -1,0 +1,15 @@
+{
+    "menu":"Menu",
+    "conversor": "Conversor",
+    "transacciones": "Transacciones",
+    "ajustes": "Ajustes",
+    "conversor": "Conversor",
+    "textoFormField": "Introduzca el valor",
+    "textoBoton": "Convertir y guardar",
+    "transacciones": "Transacciones",
+    "ajustes" : "Ajustes",
+    "modoOscuro": "Modo oscuro",
+    "idioma": "Idioma",
+    "tamanoTexto" : "Tamaño del texto",
+    "textoSnackbar": "Transacción guardada correctamente"
+}

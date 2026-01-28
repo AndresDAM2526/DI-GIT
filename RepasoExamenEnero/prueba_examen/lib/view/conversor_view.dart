@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:prueba_examen/l10n/app_localizations.dart';
 import 'package:prueba_examen/model/transaccion_model.dart';
 import 'package:prueba_examen/viewmodel/conversor_viewmodel.dart';
 import 'package:prueba_examen/viewmodel/database_viewmodel.dart';
-
+/**
+ * Widget que recrea la pestaña de la conversion
+ */
 class ConversorView extends StatefulWidget {
   const ConversorView({super.key});
 
@@ -18,11 +21,12 @@ class _ConversorViewState extends State<ConversorView> {
   double? valorFinal;
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final viewModelConversion = context.watch<ConversorViewmodel>();
     final viewModelDatos = context.watch<DatabaseViewmodel>();
     List<String> unidadesP = viewModelConversion.conversionRates.keys.toList();
     return Scaffold(
-      appBar: AppBar(title: Center(child: Text("Conversor"))),
+      appBar: AppBar(title: Center(child: Text(l10n!.conversor))),
       body: Form(
         key: validarFormulario,
         child: Column(
@@ -34,7 +38,7 @@ class _ConversorViewState extends State<ConversorView> {
                 controller: viewModelConversion.valor,
                 validator: (value) => viewModelConversion.validarValor(value),
                 decoration: InputDecoration(
-                  label: Text("Introduzca el valor"),
+                  label: Text(l10n.textoFormField),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -94,15 +98,13 @@ class _ConversorViewState extends State<ConversorView> {
                         valorFinal: valorFinal!,
                       ),
                     );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Transacción guardada correctamente"),
-                      ),
-                    );
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(l10n.textoSnackbar)));
                   });
                 }
               },
-              child: Text("Convertir y guardar"),
+              child: Text(l10n.textoBoton),
             ),
             Container(
               margin: EdgeInsets.all(10),
