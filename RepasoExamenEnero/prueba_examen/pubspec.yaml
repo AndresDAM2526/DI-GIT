@@ -9,6 +9,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  path: ^1.9.1
+  provider: ^6.1.5+1
+  shared_preferences: ^2.5.4
+  sqflite_common_ffi: ^2.3.7+1
 
 dev_dependencies:
   flutter_test:
