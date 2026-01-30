@@ -86,11 +86,11 @@ class _ProductosState extends State<Productos> {
                       children: [
                         ListTile(
                           leading: Radio(value: "Todos"),
-                          title: Text("Mostrar todos"),
+                          title: Text(l10n.showAll),
                         ),
                         ListTile(
                           leading: Radio(value: "Filtrar"),
-                          title: Text("Filtrar"),
+                          title: Text(l10n.filter),
                         ),
                       ],
                     ),
@@ -116,7 +116,7 @@ class _ProductosState extends State<Productos> {
                   }
                 },
                 decoration: InputDecoration(
-                  label: Text("Buscar por nombre"),
+                  label: Text(l10n.searchByName),
                   border: OutlineInputBorder(),
                 ),
               ),

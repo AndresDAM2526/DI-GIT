@@ -17,7 +17,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => DatabaseProvider()),
         ChangeNotifierProvider(create: (context) => FormularioViewmodel()),
         ChangeNotifierProvider(create: (context) => TemaViewmodel()),
-        ChangeNotifierProvider(create: (context) => CsvViewmodel(),)
+        ChangeNotifierProvider(create: (context) => CsvViewmodel()),
       ],
       child: MainApp(),
     ),
@@ -38,6 +38,7 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     return Consumer<TemaViewmodel>(
       builder: (context, value, child) {
+        final idioma = context.watch<TemaViewmodel>().idioma;
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           localizationsDelegates: [
@@ -46,7 +47,7 @@ class _MainAppState extends State<MainApp> {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          locale: Locale(context.watch<TemaViewmodel>().idioma),
+          locale: idioma == "Español" ? Locale('es') : Locale('en'),
           supportedLocales: [Locale('es'), Locale('en')],
           theme: ThemeData.light(),
           darkTheme: ThemeData.dark(),
@@ -54,30 +55,37 @@ class _MainAppState extends State<MainApp> {
           home: Builder(
             builder: (context) {
               final l10n = AppLocalizations.of(context);
-              return Scaffold(
-                bottomNavigationBar: BottomNavigationBar(
-                  currentIndex: indicePagina,
-                  onTap: (value) {
-                    setState(() {
-                      indicePagina = value;
-                    });
-                  },
-                  items: [
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.inventory),
-                      label: l10n!.bottomNavigationLabelStock,
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.blinds_closed_sharp),
-                      label: l10n.bottomNavigationLabelInvoices,
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.settings),
-                      label: l10n.bottomNavigationLabelSettings,
-                    ),
-                  ],
+              return MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  textScaler: TextScaler.linear(
+                    context.read<TemaViewmodel>().tamano,
+                  ),
                 ),
-                body: paginas[indicePagina],
+                child: Scaffold(
+                  bottomNavigationBar: BottomNavigationBar(
+                    currentIndex: indicePagina,
+                    onTap: (value) {
+                      setState(() {
+                        indicePagina = value;
+                      });
+                    },
+                    items: [
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.inventory),
+                        label: l10n!.bottomNavigationLabelStock,
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.blinds_closed_sharp),
+                        label: l10n.bottomNavigationLabelInvoices,
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.settings),
+                        label: l10n.bottomNavigationLabelSettings,
+                      ),
+                    ],
+                  ),
+                  body: paginas[indicePagina],
+                ),
               );
             },
           ),

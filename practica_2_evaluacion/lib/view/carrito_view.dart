@@ -54,9 +54,41 @@ class _CarritoViewState extends State<CarritoView> {
                   margin: EdgeInsets.all(5),
                   child: FloatingActionButton(
                     tooltip: "Pagar carrito",
-                    onPressed: () {
-                      context.read<DatabaseProvider>().crearFactura(productos);
-                      Navigator.pop(context);
+                    onPressed: () async {
+                      bool cantidadesCorrectas = true;
+                      for (var producto in productos) {
+                        bool stock = await context
+                            .read<DatabaseProvider>()
+                            .comprobarStock(
+                              producto.idProducto,
+                              producto.cantidad,
+                            );
+                        if (!stock) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                "No hay cantidad suficiente de ${producto.nombre}, modifique la cantidad",
+                              ),
+                            ),
+                          );
+                          cantidadesCorrectas = false;
+                          break;
+                        }
+                        if (cantidadesCorrectas) {
+                          for (var producto in productos) {
+                            context
+                                .read<DatabaseProvider>()
+                                .actualizarCantidadBBDD(
+                                  producto.idProducto,
+                                  producto.cantidad,
+                                );
+                          }
+                          context.read<DatabaseProvider>().crearFactura(
+                            productos,
+                          );
+                          Navigator.pop(context);
+                        }
+                      }
                     },
                     child: Icon(Icons.credit_card),
                   ),

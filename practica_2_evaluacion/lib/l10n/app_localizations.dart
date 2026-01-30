@@ -116,6 +116,24 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get bottomNavigationLabelSettings;
 
+  /// No description provided for @showAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all'**
+  String get showAll;
+
+  /// No description provided for @filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get filter;
+
+  /// No description provided for @searchByName.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name'**
+  String get searchByName;
+
   /// No description provided for @buy.
   ///
   /// In en, this message translates to:
@@ -259,6 +277,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invoices'**
   String get invoiceTitle;
+
+  /// No description provided for @emptyInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'No invoices yet'**
+  String get emptyInvoice;
 
   /// No description provided for @generatePDF.
   ///

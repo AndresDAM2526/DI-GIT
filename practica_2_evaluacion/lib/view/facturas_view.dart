@@ -16,6 +16,9 @@ class Facturas extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return CircularProgressIndicator();
           }
+          if (!snapshot.hasData) {
+            return Center(child: Text(l10n!.emptyInvoice));
+          }
           final facturas = snapshot.data!;
           return Semantics(
             label: "Lista de las facturas",

@@ -320,14 +320,40 @@ class DatabaseProvider extends ChangeNotifier {
     await prefs.setStringList('carrito', carritoSerializado);
   }
 
-  Future<void> actualizarCantidadBBDD(int idProducto, int nuevaCantidad) async {
+  Future<void> actualizarCantidadBBDD(
+    int idProducto,
+    int cantidadComprada,
+  ) async {
     final db = await database;
+    final List<Map<String, dynamic>> cantidad = await db.query(
+      'producto',
+      where: 'idProducto=?',
+      whereArgs: [idProducto],
+      columns: ['cantidad'],
+    );
+    int cantidadActual = cantidad.first['cantidad'];
+    int cantidadFinal = cantidadActual - cantidadComprada;
     await db.update(
       'producto',
-      {'cantidad': nuevaCantidad},
+      {'cantidad': cantidadFinal},
       where: 'idProducto=?',
       whereArgs: [idProducto],
     );
+    cargarProductos();
+    notifyListeners();
+    
+  }
+
+  Future<bool> comprobarStock(int idProducto, int cantidadComprada) async {
+    final db = await database;
+    final List<Map<String, dynamic>> cantidad = await db.query(
+      'producto',
+      where: 'idProducto=?',
+      whereArgs: [idProducto],
+      columns: ['cantidad'],
+    );
+    int stock = cantidad.first['cantidad'];
+    return cantidadComprada < stock;
   }
 
   Future<void> generarPDF(

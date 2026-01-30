@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:practica_2_evaluacion/l10n/app_localizations.dart';
+import 'package:practica_2_evaluacion/viewmodel/database_viewmodel.dart';
 import 'package:practica_2_evaluacion/viewmodel/tema_viewmodel.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class Ajustes extends StatefulWidget {
   @override
@@ -10,9 +12,8 @@ class Ajustes extends StatefulWidget {
 
 class _AjustesState extends State<Ajustes> {
   double tamanio = 0.0;
-  List<String> idiomas = ["es", "en"];
+  List<String> idiomas = ["Español", "English"];
 
-  String idiomaLocale = "es";
   GlobalKey<FormState> keyDropDown = GlobalKey();
 
   @override
@@ -64,10 +65,15 @@ class _AjustesState extends State<Ajustes> {
                       hint:
                           "Al deslizar nos permite aumentar o disminuir el tamaño de la fuente",
                       child: Slider(
-                        value: tamanio,
+                        min: 0.8,
+                        max: 2.0,
+                        divisions: 6,
+                        value: context.read<TemaViewmodel>().tamano,
                         onChanged: (value) {
                           setState(() {
-                            tamanio = value;
+                            context.read<TemaViewmodel>().cambiarTamanio(
+                              value,
+                            );
                           });
                         },
                       ),
@@ -93,7 +99,7 @@ class _AjustesState extends State<Ajustes> {
                           "Menú que permite al usuario cambiar el idioma de la aplicación",
                       child: DropdownButton(
                         key: keyDropDown,
-                        value: idiomaSeleccionado,
+                        hint: Text(context.read<TemaViewmodel>().idioma),
                         items: idiomas.map((idioma) {
                           return DropdownMenuItem<String>(
                             value: idioma,
@@ -102,13 +108,7 @@ class _AjustesState extends State<Ajustes> {
                         }).toList(),
                         onChanged: (value) {
                           setState(() {
-                            idiomaSeleccionado = value!;
-                            idiomaLocale = (idiomaSeleccionado == "es")
-                                ? "es"
-                                : "en";
-                            context.read<TemaViewmodel>().cambiarIdioma(
-                              idiomaLocale,
-                            );
+                            context.read<TemaViewmodel>().cambiarIdioma(value!);
                           });
                         },
                       ),

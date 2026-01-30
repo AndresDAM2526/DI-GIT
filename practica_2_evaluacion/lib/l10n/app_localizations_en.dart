@@ -18,6 +18,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bottomNavigationLabelSettings => 'Settings';
 
   @override
+  String get showAll => 'Show all';
+
+  @override
+  String get filter => 'Filter';
+
+  @override
+  String get searchByName => 'Search by name';
+
+  @override
   String get buy => 'Complete Purchase';
 
   @override
@@ -88,6 +97,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invoiceTitle => 'Invoices';
+
+  @override
+  String get emptyInvoice => 'No invoices yet';
 
   @override
   String get generatePDF => 'Generate PDF';
