@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:practica_2_evaluacion/l10n/app_localizations.dart';
 import 'package:practica_2_evaluacion/model/producto_model.dart';
 import 'package:practica_2_evaluacion/view/anadir_productos_view.dart';
@@ -9,6 +10,7 @@ import 'package:practica_2_evaluacion/view/carrito_view.dart';
 import 'package:practica_2_evaluacion/view/modificar_producto_view.dart';
 import 'package:practica_2_evaluacion/viewmodel/csv_viewmodel.dart';
 import 'package:practica_2_evaluacion/viewmodel/database_viewmodel.dart';
+import 'package:practica_2_evaluacion/widgets/dialogo_cantidad_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:badges/badges.dart' as badges;
 
@@ -22,6 +24,7 @@ class _ProductosState extends State<Productos> {
   String? botonSeleccionado;
   @override
   Widget build(BuildContext context) {
+    final locale = Localizations.localeOf(context);
     final productos = context.watch<DatabaseProvider>().productos;
     final productosFiltrados = context
         .watch<DatabaseProvider>()
@@ -59,9 +62,7 @@ class _ProductosState extends State<Productos> {
                       showDialog(
                         context: context,
                         builder: (context) {
-                          return Dialog(
-                            child: CarritoView(productos: productosCarrito),
-                          );
+                          return Dialog(child: CarritoView());
                         },
                       );
                     },
@@ -201,7 +202,17 @@ class _ProductosState extends State<Productos> {
                                   DataCell(
                                     Text(producto['cantidad'].toString()),
                                   ),
-                                  DataCell(Text(producto['precio'].toString())),
+                                  DataCell(
+                                    Text(
+                                      NumberFormat.currency(
+                                        locale: locale.toString(),
+                                      ).format(
+                                        double.parse(
+                                          producto['precio'].toString(),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                   DataCell(
                                     Row(
                                       children: [
@@ -219,70 +230,40 @@ class _ProductosState extends State<Productos> {
                                               onPressed: () async {
                                                 int cantidad = await showDialog(
                                                   context: context,
-                                                  builder: (context) {
-                                                    TextEditingController?
-                                                    cantidadSeleccionada;
-                                                    return AlertDialog(
-                                                      title: Text("Cantidad"),
-                                                      actions: [
-                                                        Column(
-                                                          children: [
-                                                            TextField(
-                                                              controller:
-                                                                  cantidadSeleccionada,
-                                                            ),
-                                                            ElevatedButton(
-                                                              onPressed: () {
-                                                                if (double.tryParse(
-                                                                      cantidadSeleccionada!
-                                                                          .text,
-                                                                    ) !=
-                                                                    null) {
-                                                                  Navigator.pop(
-                                                                    context,
-                                                                    double.parse(
-                                                                      cantidadSeleccionada
-                                                                          .text,
-                                                                    ),
-                                                                  );
-                                                                } else {
-                                                                  print(
-                                                                    "Incorrecto",
-                                                                  );
-                                                                }
-                                                              },
-                                                              child: Text(
-                                                                "Confirmar",
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    );
-                                                  },
+                                                  builder: (context) =>
+                                                      DialogoCantidadWidget(),
                                                 );
-                                                int idProducto =
-                                                    producto['idProducto'];
-                                                String nombre =
-                                                    producto['nombre'];
-                                                String categoria =
-                                                    producto['categoria'];
-
-                                                double precio =
-                                                    producto['precio'];
-                                                Producto nuevoProducto =
-                                                    Producto(
-                                                      idProducto: idProducto,
-                                                      nombre: nombre,
-                                                      categoria: categoria,
-                                                      cantidad: cantidad,
-                                                      precio: precio,
-                                                    );
-                                                context
-                                                    .read<DatabaseProvider>()
-                                                    .anadirProductoCarrito(
-                                                      nuevoProducto,
-                                                    );
+                                                if (context
+                                                        .read<
+                                                          DatabaseProvider
+                                                        >()
+                                                        .existeProducto(
+                                                          producto['idProducto'],
+                                                        ) ==
+                                                    true) {
+                                                  context
+                                                      .read<DatabaseProvider>()
+                                                      .actualizarCantidad(
+                                                        producto['idProducto'],
+                                                        cantidad,
+                                                      );
+                                                } else {
+                                                  context
+                                                      .read<DatabaseProvider>()
+                                                      .anadirProductoCarrito(
+                                                        Producto(
+                                                          idProducto:
+                                                              producto['idProducto'],
+                                                          nombre:
+                                                              producto['nombre'],
+                                                          categoria:
+                                                              producto['categoria'],
+                                                          cantidad: cantidad,
+                                                          precio:
+                                                              producto['precio'],
+                                                        ),
+                                                      );
+                                                }
                                               },
                                               child: Icon(Icons.shopping_cart),
                                             ),
@@ -346,7 +327,17 @@ class _ProductosState extends State<Productos> {
                                   DataCell(
                                     Text(producto['cantidad'].toString()),
                                   ),
-                                  DataCell(Text(producto['precio'].toString())),
+                                  DataCell(
+                                    Text(
+                                      NumberFormat.currency(
+                                        locale: locale.toString(),
+                                      ).format(
+                                        double.parse(
+                                          producto['precio'].toString(),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                   DataCell(
                                     Row(
                                       children: [

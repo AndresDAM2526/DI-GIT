@@ -36,6 +36,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tablePrice => 'Price';
 
   @override
+  String get cart => 'Carrito';
+
+  @override
   String get emptyCart => 'Cart is empty';
 
   @override

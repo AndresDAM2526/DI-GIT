@@ -21,7 +21,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get buy => 'Realizar compra';
 
   @override
-  String get stockTitle => 'Stock';
+  String get stockTitle => 'Inventario';
 
   @override
   String get tableName => 'Nombre';
@@ -34,6 +34,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tablePrice => 'Precio';
+
+  @override
+  String get cart => 'Carrito';
 
   @override
   String get emptyCart => 'Carrito vacio';

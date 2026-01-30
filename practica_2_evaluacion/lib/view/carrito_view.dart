@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:practica_2_evaluacion/model/producto_model.dart';
+import 'package:practica_2_evaluacion/l10n/app_localizations.dart';
 import 'package:practica_2_evaluacion/viewmodel/database_viewmodel.dart';
+import 'package:practica_2_evaluacion/widgets/card_producto_carrito_widget.dart';
 import 'package:provider/provider.dart';
 
 class CarritoView extends StatefulWidget {
-  List<Producto> productos;
-  CarritoView({super.key, required this.productos});
+  CarritoView({super.key});
 
   @override
   State<CarritoView> createState() => _CarritoViewState();
@@ -14,26 +14,36 @@ class CarritoView extends StatefulWidget {
 class _CarritoViewState extends State<CarritoView> {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final productos = context.watch<DatabaseProvider>().carrito;
     return Scaffold(
-      appBar: AppBar(title: Center(child: Text("Carrito"))),
-      body: widget.productos.isEmpty
-          ? Center(child: Text("No hay producto actualmente en el carrito"))
+      appBar: AppBar(title: Center(child: Text(l10n!.cart))),
+      body: productos.isEmpty
+          ? Center(child: Text(l10n.emptyCart))
           : ListView.builder(
-              itemCount: widget.productos.length,
+              itemCount: productos.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(widget.productos[index].nombre),
-                  subtitle: Text("${widget.productos[index].precio}"),
+                final producto = productos[index];
+                return CardProductoCarritoWidget(
+                  producto: producto,
+                  borrar: () {
+                    setState(() {
+                      context.read<DatabaseProvider>().borrarProductoCarrito(
+                        producto.idProducto,
+                      );
+                    });
+                  },
                 );
               },
             ),
-      floatingActionButton: widget.productos.isNotEmpty
+      floatingActionButton: productos.isNotEmpty
           ? Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Container(
                   margin: EdgeInsets.all(5),
                   child: FloatingActionButton(
+                    tooltip: "Vaciar carrito",
                     onPressed: () {
                       context.read<DatabaseProvider>().vaciarCarrito();
                     },
@@ -43,10 +53,9 @@ class _CarritoViewState extends State<CarritoView> {
                 Container(
                   margin: EdgeInsets.all(5),
                   child: FloatingActionButton(
+                    tooltip: "Pagar carrito",
                     onPressed: () {
-                      context.read<DatabaseProvider>().crearFactura(
-                        widget.productos,
-                      );
+                      context.read<DatabaseProvider>().crearFactura(productos);
                       Navigator.pop(context);
                     },
                     child: Icon(Icons.credit_card),

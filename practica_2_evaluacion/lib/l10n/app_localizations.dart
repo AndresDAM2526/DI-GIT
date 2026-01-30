@@ -152,6 +152,12 @@ abstract class AppLocalizations {
   /// **'Price'**
   String get tablePrice;
 
+  /// No description provided for @cart.
+  ///
+  /// In en, this message translates to:
+  /// **'Carrito'**
+  String get cart;
+
   /// No description provided for @emptyCart.
   ///
   /// In en, this message translates to:

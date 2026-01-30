@@ -8,6 +8,7 @@
     "tableCategory": "Category",
     "tableQuantity": "Quantity",
     "tablePrice": "Price",
+    "cart" : "Carrito",
     "emptyCart": "Cart is empty",
     "notEmptyCart": "Products",
     "emptyCartAction": "Clear cart",

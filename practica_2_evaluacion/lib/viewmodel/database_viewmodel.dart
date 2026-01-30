@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
@@ -55,6 +54,14 @@ class DatabaseProvider extends ChangeNotifier {
         .toList();
   }
 
+  void borrarProductoCarrito(int idPrducto) async {
+    carrito.removeWhere((producto) => producto.idProducto == idPrducto);
+    notifyListeners();
+    List<String> carritoSerializado = convertirCarrito(carrito);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('carrito', carritoSerializado);
+  }
+
   void vaciarCarrito() async {
     carrito.clear();
     List<String> carritoSerializado = convertirCarrito(carrito);
@@ -97,6 +104,8 @@ class DatabaseProvider extends ChangeNotifier {
                           idDetalle INTEGER PRIMARY KEY AUTOINCREMENT,
                           idFactura INTEGER,
                           idProducto INTEGER,
+                          cantidad INTEGER,
+                          precio REAL
 
                           FOREIGN KEY(idFactura) references factura(idFactura) ON DELETE CASCADE ON UPDATE CASCADE,
                           FOREIGN KEY(idProducto) references producto(idProducto) ON DELETE CASCADE ON UPDATE CASCADE
@@ -266,6 +275,8 @@ class DatabaseProvider extends ChangeNotifier {
       await db.insert('detalle_factura', {
         'idFactura': idFactura,
         'idProducto': prod.idProducto,
+        'cantidad': prod.cantidad,
+        'precio': prod.precio,
       });
     }
     notifyListeners();
@@ -286,12 +297,37 @@ class DatabaseProvider extends ChangeNotifier {
   Future<List<ProductoFactura>> productosFactura(int idFactura) async {
     final db = await database;
     final productos = await db.rawQuery(
-      'select p.nombre,p.precio FROM Producto p INNER JOIN detalle_factura df ON df.idProducto=p.idProducto INNER JOIN factura f on df.idFactura=f.idFactura WHERE f.idFactura= ? ',
+      'SELECT p.nombre,df.cantidad,df.precio FROM detalle_factura df INNER JOIN producto p ON p.idProducto=df.idProducto WHERE df.idFactura=?',
       [idFactura],
     );
     return productos
         .map((producto) => ProductoFactura.fromJson(producto))
         .toList();
+  }
+
+  bool existeProducto(int idProducto) {
+    return carrito.any((producto) => producto.idProducto == idProducto);
+  }
+
+  Future<void> actualizarCantidad(int idProducto, int nuevaCantidad) async {
+    int index = carrito.indexWhere(
+      (producto) => producto.idProducto == idProducto,
+    );
+    carrito[index].cantidad += nuevaCantidad;
+    notifyListeners();
+    List<String> carritoSerializado = convertirCarrito(carrito);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('carrito', carritoSerializado);
+  }
+
+  Future<void> actualizarCantidadBBDD(int idProducto, int nuevaCantidad) async {
+    final db = await database;
+    await db.update(
+      'producto',
+      {'cantidad': nuevaCantidad},
+      where: 'idProducto=?',
+      whereArgs: [idProducto],
+    );
   }
 
   Future<void> generarPDF(
@@ -329,6 +365,10 @@ class DatabaseProvider extends ChangeNotifier {
                         ),
                         pw.Padding(
                           padding: pw.EdgeInsets.all(5),
+                          child: pw.Text("Cantidad"),
+                        ),
+                        pw.Padding(
+                          padding: pw.EdgeInsets.all(5),
                           child: pw.Text("Precio"),
                         ),
                       ],
@@ -339,6 +379,10 @@ class DatabaseProvider extends ChangeNotifier {
                           pw.Padding(
                             padding: pw.EdgeInsets.all(5),
                             child: pw.Text(producto.nombre),
+                          ),
+                          pw.Padding(
+                            padding: pw.EdgeInsets.all(5),
+                            child: pw.Text("${producto.cantidad}"),
                           ),
                           pw.Padding(
                             padding: pw.EdgeInsets.all(5),
