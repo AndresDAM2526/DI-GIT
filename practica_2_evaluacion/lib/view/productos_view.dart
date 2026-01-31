@@ -14,6 +14,7 @@ import 'package:practica_2_evaluacion/widgets/dialogo_cantidad_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:badges/badges.dart' as badges;
 
+///Vista que muestra en formato de tabla todos los productos de la base de datos
 class Productos extends StatefulWidget {
   @override
   State<Productos> createState() => _ProductosState();
@@ -103,7 +104,7 @@ class _ProductosState extends State<Productos> {
               margin: EdgeInsets.all(20),
               child: TextField(
                 onChanged: (value) {
-                  if (botonSeleccionado == "Todos") {
+                  if (botonSeleccionado == "Todos") { 
                     context.read<DatabaseProvider>().buscarProductosPorNombre(
                       value,
                       "Todos",
@@ -124,7 +125,7 @@ class _ProductosState extends State<Productos> {
             Container(
               margin: EdgeInsets.all(12),
               child: botonSeleccionado == "Filtrar"
-                  ? categorias.isEmpty
+                  ? categorias.isEmpty //Si las categorías no se han cargado o no se han podido cargar se muestra el indicador circular, si no , muestra el toggleButtons
                         ? Center(child: CircularProgressIndicator())
                         : ToggleButtons(
                             fillColor: Colors.green,
@@ -151,8 +152,14 @@ class _ProductosState extends State<Productos> {
                   "Se visualizan todos los productos disponibles en la tienda en formato de tabla. Las columnas de la tabla son nombre, categoria,cantidad y precio del producto",
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: botonSeleccionado == "Todos"
+                child: botonSeleccionado == "Todos" //Se cargan todos los productos de la base de datos
                     ? DataTable(
+                        decoration: BoxDecoration(
+                          border: BoxBorder.all(
+                            width: 5,
+                            color: Color.fromARGB(255, 33, 150, 243),
+                          ),
+                        ),
                         columns: [
                           DataColumn(label: Text("")),
                           DataColumn(label: Text(l10n.tableName)),
@@ -192,7 +199,7 @@ class _ProductosState extends State<Productos> {
                                                   producto['idProducto'],
                                                 );
                                           },
-                                          child: Icon(Icons.remove),
+                                          child: Icon(Icons.delete),
                                         ),
                                       ],
                                     ),
@@ -228,12 +235,23 @@ class _ProductosState extends State<Productos> {
                                               heroTag:
                                                   "anadir-${producto['nombre']}",
                                               onPressed: () async {
-                                                int cantidad = await showDialog(
+                                                int?
+                                                cantidad = await showDialog(
                                                   context: context,
                                                   builder: (context) =>
                                                       DialogoCantidadWidget(),
                                                 );
-                                                if (context
+                                                if (cantidad == null) {
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        l10n.emptyQuantity,
+                                                      ),
+                                                    ),
+                                                  );
+                                                } else if (context
                                                         .read<
                                                           DatabaseProvider
                                                         >()
@@ -286,7 +304,7 @@ class _ProductosState extends State<Productos> {
                           DataColumn(label: Text(l10n.tablePrice)),
                           DataColumn(label: Text("")),
                         ],
-                        rows: productosFiltrados
+                        rows: productosFiltrados //Se cargan solo _productosfiltrados
                             .map(
                               (producto) => DataRow(
                                 cells: [
@@ -409,7 +427,10 @@ class _ProductosState extends State<Productos> {
                   final csvViewmodel = context.read<CsvViewmodel>();
                   final databaseViewModel = context.read<DatabaseProvider>();
                   FilePickerResult? fichero = await FilePicker.platform
-                      .pickFiles();
+                      .pickFiles(
+                        allowedExtensions: ['csv'],
+                        type: FileType.custom,
+                      );
                   if (fichero != null) {
                     File file = File(fichero.files.single.path!);
                     final productosSerializados = csvViewmodel.cargarCsv(file);

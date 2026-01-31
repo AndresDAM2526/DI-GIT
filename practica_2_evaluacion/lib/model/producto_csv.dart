@@ -1,3 +1,4 @@
+///Clase usada para cargar los productos de los ficheros CSV
 class ProductoCsv {
   String nombre;
   String categoria;

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:practica_2_evaluacion/l10n/app_localizations.dart';
-import 'package:practica_2_evaluacion/viewmodel/database_viewmodel.dart';
 import 'package:practica_2_evaluacion/viewmodel/tema_viewmodel.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+///Vista que permite cambiar la apariencia de la aplicacion
 class Ajustes extends StatefulWidget {
   @override
   State<Ajustes> createState() => _AjustesState();
@@ -18,7 +17,6 @@ class _AjustesState extends State<Ajustes> {
 
   @override
   Widget build(BuildContext context) {
-    String idiomaSeleccionado = context.read<TemaViewmodel>().idioma;
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Center(child: Text(l10n!.setingsTitle))),
@@ -27,12 +25,16 @@ class _AjustesState extends State<Ajustes> {
         child: Column(
           children: [
             Card(
+              elevation: 10,
               child: Container(
                 margin: EdgeInsets.all(20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(l10n!.darkMode),
+                    Text(
+                      l10n.darkMode,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     Container(
                       margin: EdgeInsets.only(left: 5),
                       child: Semantics(
@@ -55,11 +57,15 @@ class _AjustesState extends State<Ajustes> {
               ),
             ),
             Card(
+              elevation: 10,
               child: Container(
                 margin: EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    Text(l10n.fontSize),
+                    Text(
+                      l10n.fontSize,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     Semantics(
                       label: "Permite cambiar el tamaño de la fuente",
                       hint:
@@ -71,9 +77,7 @@ class _AjustesState extends State<Ajustes> {
                         value: context.read<TemaViewmodel>().tamano,
                         onChanged: (value) {
                           setState(() {
-                            context.read<TemaViewmodel>().cambiarTamanio(
-                              value,
-                            );
+                            context.read<TemaViewmodel>().cambiarTamanio(value);
                           });
                         },
                       ),
@@ -83,6 +87,7 @@ class _AjustesState extends State<Ajustes> {
               ),
             ),
             Card(
+              elevation: 10,
               child: Container(
                 margin: EdgeInsets.all(20),
                 child: Row(
@@ -90,27 +95,35 @@ class _AjustesState extends State<Ajustes> {
                   children: [
                     Container(
                       margin: EdgeInsets.all(5),
-                      child: Text(l10n!.language),
+                      child: Text(
+                        l10n.language,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                     Semantics(
                       label:
                           "Menú desplegable que permite cambiar el idioma de la aplicación",
                       hint:
                           "Menú que permite al usuario cambiar el idioma de la aplicación",
-                      child: DropdownButton(
-                        key: keyDropDown,
-                        hint: Text(context.read<TemaViewmodel>().idioma),
-                        items: idiomas.map((idioma) {
-                          return DropdownMenuItem<String>(
-                            value: idioma,
-                            child: Text(idioma),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            context.read<TemaViewmodel>().cambiarIdioma(value!);
-                          });
-                        },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: DropdownButton(
+                          key: keyDropDown,
+                          hint: Text(context.read<TemaViewmodel>().idioma),
+                          items: idiomas.map((idioma) {
+                            return DropdownMenuItem<String>(
+                              value: idioma,
+                              child: Text(idioma),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              context.read<TemaViewmodel>().cambiarIdioma(
+                                value!,
+                              );
+                            });
+                          },
+                        ),
                       ),
                     ),
                   ],

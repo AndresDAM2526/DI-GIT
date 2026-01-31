@@ -9,7 +9,7 @@ import 'package:practica_2_evaluacion/viewmodel/database_viewmodel.dart';
 import 'package:practica_2_evaluacion/viewmodel/formulario_viewmodel.dart';
 import 'package:practica_2_evaluacion/viewmodel/tema_viewmodel.dart';
 import 'package:provider/provider.dart';
-
+///Aplicación usada para gestionar el inventario de una tienda de informática
 void main() {
   runApp(
     MultiProvider(
@@ -49,8 +49,17 @@ class _MainAppState extends State<MainApp> {
           ],
           locale: idioma == "Español" ? Locale('es') : Locale('en'),
           supportedLocales: [Locale('es'), Locale('en')],
-          theme: ThemeData.light(),
-          darkTheme: ThemeData.dark(),
+          theme: ThemeData(
+            scaffoldBackgroundColor: Color(0xFFF0F4F8),
+            primaryColor: Color(0xFFF0F4F8),
+            appBarTheme: AppBarTheme(backgroundColor: Color(0xFFA5A7A8)),
+          ),
+          darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            primaryColor: Color(0xFF1E2732),
+            scaffoldBackgroundColor: Color(0xFF1E2732),
+            cardColor: Color(0xFF1E2732),
+          ),
           themeMode: value.tema,
           home: Builder(
             builder: (context) {

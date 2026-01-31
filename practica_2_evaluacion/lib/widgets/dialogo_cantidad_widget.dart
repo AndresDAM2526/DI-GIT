@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+///Widget personalizado usado para pedir la cantidad en el momento de añadir un producto al carrito
 class DialogoCantidadWidget extends StatelessWidget {
   const DialogoCantidadWidget({super.key});
 

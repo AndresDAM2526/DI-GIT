@@ -5,6 +5,7 @@ import 'package:practica_2_evaluacion/viewmodel/database_viewmodel.dart';
 import 'package:practica_2_evaluacion/viewmodel/formulario_viewmodel.dart';
 import 'package:provider/provider.dart';
 
+///Vista que muestra un formulario usado para añadir un producto
 class anadirProductos extends StatefulWidget {
   @override
   State<anadirProductos> createState() => _anadirProductosState();

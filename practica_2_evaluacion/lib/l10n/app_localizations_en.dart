@@ -57,6 +57,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emptyCartAction => 'Clear cart';
 
   @override
+  String get emptyQuantity =>
+      'You must choose a quantity to add the product to the cart';
+
+  @override
   String get tableEdit => 'Edit product';
 
   @override
@@ -97,6 +101,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invoiceTitle => 'Invoices';
+
+  @override
+  String get orderDate => 'Order date';
+
+  @override
+  String get total => 'Total';
 
   @override
   String get emptyInvoice => 'No invoices yet';

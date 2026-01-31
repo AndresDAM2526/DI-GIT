@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:practica_2_evaluacion/model/producto_model.dart';
-
+///Widget personalizado que muestra un widget de tipo Card para mostrar los productos del carrito 
 class CardProductoCarritoWidget extends StatefulWidget {
+  ///Variable de tipo producto
   Producto producto;
+  ///Función usada para borrar un producto del carrito
   Function() borrar;
   CardProductoCarritoWidget({
     super.key,

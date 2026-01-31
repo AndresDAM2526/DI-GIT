@@ -4,8 +4,9 @@ import 'package:practica_2_evaluacion/model/producto_model.dart';
 import 'package:practica_2_evaluacion/viewmodel/database_viewmodel.dart';
 import 'package:practica_2_evaluacion/viewmodel/formulario_viewmodel.dart';
 import 'package:provider/provider.dart';
-
+///Vista usada para modificar los datos de un producto
 class modificarProducto extends StatefulWidget {
+  ///Atributo relacionado con el identificador del producto
   int idProducto;
   modificarProducto({required this.idProducto});
   @override

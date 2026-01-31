@@ -4,6 +4,7 @@ import 'package:practica_2_evaluacion/viewmodel/database_viewmodel.dart';
 import 'package:practica_2_evaluacion/widgets/card_producto_carrito_widget.dart';
 import 'package:provider/provider.dart';
 
+///Vista que muestra los productos que se encuentran en el carrito
 class CarritoView extends StatefulWidget {
   CarritoView({super.key});
 
@@ -74,20 +75,20 @@ class _CarritoViewState extends State<CarritoView> {
                           cantidadesCorrectas = false;
                           break;
                         }
-                        if (cantidadesCorrectas) {
-                          for (var producto in productos) {
-                            context
-                                .read<DatabaseProvider>()
-                                .actualizarCantidadBBDD(
-                                  producto.idProducto,
-                                  producto.cantidad,
-                                );
-                          }
-                          context.read<DatabaseProvider>().crearFactura(
-                            productos,
-                          );
-                          Navigator.pop(context);
+                      }
+                      if (cantidadesCorrectas) {
+                        for (var producto in productos) {
+                          context
+                              .read<DatabaseProvider>()
+                              .actualizarCantidadBBDD(
+                                producto.idProducto,
+                                producto.cantidad,
+                              );
                         }
+                        context.read<DatabaseProvider>().crearFactura(
+                          productos,
+                        );
+                        Navigator.pop(context);
                       }
                     },
                     child: Icon(Icons.credit_card),

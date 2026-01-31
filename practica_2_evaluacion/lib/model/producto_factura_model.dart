@@ -1,3 +1,4 @@
+///Clase usada para generar un objeto de tipo producto usado para generar la factura
 class ProductoFactura {
   String nombre;
   double precio;

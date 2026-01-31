@@ -194,6 +194,12 @@ abstract class AppLocalizations {
   /// **'Clear cart'**
   String get emptyCartAction;
 
+  /// No description provided for @emptyQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'You must choose a quantity to add the product to the cart'**
+  String get emptyQuantity;
+
   /// No description provided for @tableEdit.
   ///
   /// In en, this message translates to:
@@ -277,6 +283,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invoices'**
   String get invoiceTitle;
+
+  /// No description provided for @orderDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Order date'**
+  String get orderDate;
+
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
 
   /// No description provided for @emptyInvoice.
   ///

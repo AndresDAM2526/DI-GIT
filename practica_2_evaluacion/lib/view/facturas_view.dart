@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:practica_2_evaluacion/l10n/app_localizations.dart';
 
 import 'package:practica_2_evaluacion/viewmodel/database_viewmodel.dart';
 import 'package:provider/provider.dart';
 
+///Vista que muestra en un ListView el identificador de la factura, la fecha, el total y un botón para generar el pdf con esa información
 class Facturas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final locale = Localizations.localeOf(context);
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Center(child: Text("Facturas"))),
@@ -33,8 +36,14 @@ class Facturas extends StatelessWidget {
                   child: Card(
                     child: ListTile(
                       leading: Text(factura['idFactura'].toString()),
-                      title: Text(factura['fecha']),
-                      subtitle: Text(factura['total'].toString()),
+                      title: Text(
+                        "${l10n!.orderDate}: ${factura['fecha']}",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        " ${l10n.total}: ${NumberFormat.currency(locale: locale.toString()).format(double.parse(factura['total'].toString()))}",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       trailing: Semantics(
                         label:
                             "Botón para generar un PDF con los datos de esa factura",

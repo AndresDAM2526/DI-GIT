@@ -57,6 +57,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get emptyCartAction => 'Vaciar carrito';
 
   @override
+  String get emptyQuantity =>
+      'Debe elegir una cantidad para poder añadir el producto al carrito';
+
+  @override
   String get tableEdit => 'Editar producto';
 
   @override
@@ -97,6 +101,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get invoiceTitle => 'Facturas';
+
+  @override
+  String get orderDate => 'Fecha de compra';
+
+  @override
+  String get total => 'Total';
 
   @override
   String get emptyInvoice => 'No hay facturas aún';
