@@ -1,0 +1,21 @@
+{
+    "drawerTitulo": "Library manager",
+    "drawerGestion": "Manager",
+    "drawerListado": "List",
+    "drawerAjustes": "Settings",
+    "vistaGestion": "Manager",
+    "nuevoLibro": "New book",
+    "titulo": "title",
+    "autor": "Author",
+    "genero": "Genre",
+    "estado": "State",
+    "disponible": "Available",
+    "prestado" : "Prestado",
+    "guardar": "Save",
+    "listado": "List",
+    "libroEliminado": "Delete book",
+    "ajustes": "Settings",
+    "modoOscuro": "Dark mode",
+    "idioma": "Language",
+    "tamanoTexto": "Font size"
+}

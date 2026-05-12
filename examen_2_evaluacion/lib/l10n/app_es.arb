@@ -1,0 +1,21 @@
+{
+    "drawerTitulo": "Gestor de libreria",
+    "drawerGestion": "Gestion",
+    "drawerListado": "Listado",
+    "drawerAjustes": "Ajustes",
+    "vistaGestion": "Gestión",
+    "nuevoLibro": "Nuevo libro",
+    "titulo": "Titulo",
+    "autor": "Autor",
+    "genero": "Genero",
+    "estado": "Estado",
+    "disponible": "Disponible",
+    "prestado" : "Prestado",
+    "guardar": "Guardar",
+    "listado": "Listado",
+    "libroEliminado": "Libro eliminado",
+    "ajustes": "Ajustes",
+    "modoOscuro": "Modo oscuro",
+    "idioma": "Idioma",
+    "tamanoTexto": "Tamaño del texto"
+}
